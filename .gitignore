@@ -1,0 +1,19 @@
+# Credential material — never commit (see AGENTS.md rule 1, PLAN.md §8.1)
+keys/
+
+# Build and run artifacts
+reports/
+artifacts/
+journal/
+labimages/
+*.tar.gz
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*.swp
+
+# Python/docs tooling
+.venv/
+__pycache__/
+site/
