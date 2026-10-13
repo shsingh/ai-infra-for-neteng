@@ -1,0 +1,50 @@
+# See https://pre-commit.com for more information
+# Runs as a pre-commit.ci GitHub App check on every PR (autofix_prs: false)
+# and locally via `pre-commit run --all-files`.
+# Adapted from the house recipe (trishula / kailash-os / ai-sec-lab).
+default_stages: [pre-commit]
+ci:
+  autofix_prs: false
+  submodules: false
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+        exclude: '(^keys/|.*\.(pem|crt|key)$|^(AGENTS|PLAN)\.md$)'
+      - id: end-of-file-fixer
+        exclude: '(^keys/|.*\.(pem|crt|key)$|^(AGENTS|PLAN)\.md$)'
+      - id: mixed-line-ending
+        args: [--fix=lf]
+        exclude: '^keys/'
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-executables-have-shebangs
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+        exclude: '^(nix/|pkgs/|apps/|devShells/|fabric/)'  # embedded shell in Nix strings trips the YAML parser
+      - id: check-json
+      - id: check-toml
+      - id: check-added-large-files
+      - id: detect-private-key
+        exclude: '^keys/'  # credential material is reviewed by hand, never committed (AGENTS.md rule 1)
+
+  # No standalone shell scripts live in this repo (AGENTS.md rule 2: the only
+  # scripted surface is Nix); shellcheck covers anything that slips in anyway.
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.11.0.1
+    hooks:
+      - id: shellcheck
+
+  # Secret scanning — keys/ holds credential material (gitignored, but belt and braces)
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+        name: Detect hardcoded secrets
+        description: Detect hardcoded secrets using Gitleaks
+        entry: gitleaks protect --verbose --redact --staged
+        language: golang
+        pass_filenames: false
