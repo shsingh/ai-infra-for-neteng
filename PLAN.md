@@ -3,11 +3,12 @@
 Revision 1.0 — October 2026. Status: plan — the lab described here is specified in full and
 not yet built. Companion: [AGENTS.md](AGENTS.md) (operating contract for build agents).
 
-The course design document (not in this repo) defines 13 instructor-led modules for network
-engineers, taught through a three-planes narrative (management, control, data) and one
-university case study. Everything in the course is declarative: custom resources in Git,
-applied by students by hand, verified through status conditions and TMM `tmctl` tables. This
-plan specifies the repository that makes the lab real and self-bootstrapping. The published
+The course defines 13 instructor-led modules for network engineers, taught through a
+three-planes narrative (management, control, data) and one university case study
+([course/](course/README.md) — the content system of record: case study, teaching model,
+per-module scripts). Everything in the course is declarative: custom resources in Git,
+applied by students by hand, verified through status conditions and TMM `tmctl` tables.
+This plan specifies the repository that makes the lab real and self-bootstrapping. The published
 F5 documentation ([References](#13-references)) is the source of truth for every product behavior,
 manifest field, and verification command quoted here; where this plan and the F5 docs
 disagree, the F5 docs win and this plan must be corrected.
@@ -64,27 +65,29 @@ host, so worker reservations must fit the Docker daemon's allocation — hence t
 
 ## 3. Course-to-build map
 
-**Table 4: Modules mapped to repo deliverables** (T = target time, M = minimum viable)
+**Table 4: Modules mapped to repo deliverables** (content source of record: [course/modules](course/modules/m01.md); this table maps the repo outputs only)
 
-| Module | T/M (min) | Build outputs | Lab guide |
-|---|---|---|---|
-| M1 Kubernetes for network engineers | 45/30 | README quickstart, devShell, `m1-orient` app, fault `m1-endpoints` | labs/lab01-kubernetes.md |
-| M2 Why AI runs on Kubernetes (concept) | 20/15 | Class intro + lab01 preamble | (class intro) |
-| M3 Install BNK (host vs DPU; demo mode) | 45/35 | bootstrap/deploy apps, kindbnkctl 2.4.0 override, doctor | labs/lab02-install-bnk.md |
-| M4 BGP, VRF, EVPN (OcNOS path) | 60/45 | `manifests/bgp/*`, `fabric/frr.conf`, m4 apps, faults `m4-bgp-secret`, `m4-vxlan-vni` | labs/lab03-routing-bgp.md |
-| M5 VRF deep dive + per-tenant ACL | 15/10 | `policy-tenant-ai.yaml` (SecPolicy), m5 apps | labs/lab04-tenant-isolation.md |
-| M6 Gateway API (VIP to Route) | 45/35 | `01-demo-app`, `02-gateway-httproute`, `03-irule-cneirule`, m6 apps, fault `m6-route-ns` | labs/lab05-gateway-api.md |
-| M7 Traditional LB (L4Route, egress, firewall) | 45/35 | `04-l4route-gateway`, `05-egress-gateway`, `06-fw-policy`, m7 apps, fault `m7-l4port` | labs/lab06-traditional-lb.md |
-| M8 AI ingress (InferencePool, F5EPP) | 60/45 | `07-ai-sim`, `08-f5epp`, `09-inferencepool`, `10-httproute-inference`, m8 blast + tmctl apps, faults `m8-epp-selector`, `m8-pool-ports` | labs/lab07-ai-inference.md |
-| M9 Observability + finale | 30/20 | `m9-telemetry`, `m9-finale`, `docs/expected/` captures | labs/lab08-observability.md |
-| M10 bnk-forge GUI (optional) | 25/15 | runbook + screenshots | labs/lab09-bnk-forge.md |
-| M11 Can OSS do this? (optional) | 25/20 | argument-table page (no cluster work) | labs/lab10-oss-vs-bnk.md |
-| M12 AI-sec prompt screening (optional) | 30/20 | `11-nova-deployment`, `12-nova-rules`, `13-httproute-ai-sec`, `m12-attack` app | labs/lab11-ai-sec.md |
-| M13 Shared-model token governance (optional) | 35/25 | `14-token-governance-gateway`, `15-m13-tenant-fw`, `m13-hsl-tail` + `m13-breach` apps | labs/lab12-shared-model-security.md |
+| Module | Build outputs | Lab guide |
+|---|---|---|
+| M1 Kubernetes for network engineers | README quickstart, devShell, `m1-orient` app, fault `m1-endpoints` | labs/lab01-kubernetes.md |
+| M2 Why AI runs on Kubernetes (concept) | Class intro + lab01 preamble | (class intro) |
+| M3 Install BNK (host vs DPU; demo mode) | bootstrap/deploy apps, kindbnkctl 2.4.0 override, doctor | labs/lab02-install-bnk.md |
+| M4 BGP, VRF, EVPN (OcNOS path) | `manifests/bgp/*`, `fabric/frr.conf`, m4 apps, faults `m4-bgp-secret`, `m4-vxlan-vni` | labs/lab03-routing-bgp.md |
+| M5 VRF deep dive + per-tenant ACL | `policy-tenant-ai.yaml` (SecPolicy), m5 apps | labs/lab04-tenant-isolation.md |
+| M6 Gateway API (VIP to Route) | `01-demo-app`, `02-gateway-httproute`, `03-irule-cneirule`, m6 apps, fault `m6-route-ns` | labs/lab05-gateway-api.md |
+| M7 Traditional LB (L4Route, egress, firewall) | `04-l4route-gateway`, `05-egress-gateway`, `06-fw-policy`, m7 apps, fault `m7-l4port` | labs/lab06-traditional-lb.md |
+| M8 AI ingress (InferencePool, F5EPP) | `07-ai-sim`, `08-f5epp`, `09-inferencepool`, `10-httproute-inference`, m8 blast + tmctl apps, faults `m8-epp-selector`, `m8-pool-ports` | labs/lab07-ai-inference.md |
+| M9 Observability + finale | `m9-telemetry`, `m9-finale`, `docs/expected/` captures | labs/lab08-observability.md |
+| M10 bnk-forge GUI (optional) | runbook + screenshots | labs/lab09-bnk-forge.md |
+| M11 Can OSS do this? (optional) | argument-table page (no cluster work) | labs/lab10-oss-vs-bnk.md |
+| M12 AI-sec prompt screening (optional) | `11-nova-deployment`, `12-nova-rules`, `13-httproute-ai-sec`, `m12-attack` app | labs/lab11-ai-sec.md |
+| M13 Shared-model token governance (optional) | `14-token-governance-gateway`, `15-m13-tenant-fw`, `m13-hsl-tail` + `m13-breach` apps | labs/lab12-shared-model-security.md |
 
-Hard rules from the course: M8 is never cut entirely; M4/M5 absorb overruns; optional modules
-are the first cuts when running a 4–5 h cohort. Total with optionals ≈ 7.6 h target,
-≈ 5.9 h minimum; optionals make the 6 h day.
+Hard rules from the course: M8 is never cut entirely; M4/M5 absorb overruns; optional
+modules (m10–m13) are the first cuts when a cohort runs long — each optional module is
+also self-contained enough to run as a take-home exercise. The contingency decision is
+the facilitator's call in the room, guided by the module narrative beats (which parts of
+a module are demonstrable without the hands-on portion) rather than by a stopwatch.
 
 ## 4. Repository layout
 
@@ -111,8 +114,7 @@ ai-infra-for-neteng/
 │   ├── m1.nix ... m13.nix     # one app per course step (course order, §8.3)
 │   ├── break-fix.nix          # nix run .#break-fix -- <id> apply|restore
 │   ├── reset.nix              # nix run .#reset -- <module>
-│   ├── timing.nix             # per-module budget vs actual; ETA slips
-│   ├── report.nix             # post-class dump: timing, faults, event digest
+│   ├── report.nix             # post-class dump: faults run, event digest
 │   ├── ocp-demo.nix           # recorded OpenShift walkthrough (production-target notes)
 │   └── teardown.nix           # symmetric destroy
 ├── devShells/default.nix      # student shell: KUBECONFIG, PATH, pinned kubectl/kind/helm/jq/yq
@@ -379,7 +381,6 @@ Authoring rules (the honesty contract):
 - Screenshots come from actual lab runs.
 - Captures record the deployed BNK pods, CRD apiVersions, and tmctl tables exactly as
   deployed and cross-reference the FACILITATOR.md version ledger.
-- Timing lines at the top of each lab come from Table 4 (target vs minimum viable).
 - Pipeline: markdown in `docs/labs/`, mkdocs-material; rendered with `nix run .#docs` on
   the lab VM (offline-capable — the pinned site toolchain comes from the flake) and by
   GitHub Actions, which deploys Pages on main. The VM and CI produce identical output. Guides stay plain markdown (readable in-editor and on the web).
@@ -519,8 +520,9 @@ Routing-CRD and F5EPP changes are delete-and-recreate, never patch. Cohort-grade
 
 ### 8.6 Classroom fleet
 
-One identical VM per student pair; any host that falls behind re-runs bootstrap before Module 1; the
-timing tracker runs on the facilitator's host only.
+One identical VM per student pair; any host that falls behind re-runs bootstrap before
+Module 1. The facilitator's host is the control seat: doctor, break-fix injection, and
+the post-class report.
 
 ## 9. Build order (stages and exit gates)
 
@@ -530,16 +532,16 @@ does not proceed past a red gate.
 | Stage | Work | Exit gate |
 |---|---|---|
 | 0 | Repo init; AGENTS/PLAN/.gitignore/README/FACILITATOR skeleton | files present; keys/ ignored |
-| 1 (~1 h) | Flake skeleton + doctor; kindbnkctl pinned | `nix flake check` green; doctor honest |
-| 2 (~2 h) | **BNK 2.4.0 install path** (risk stage): init demo; keys placed; 2.4.0 override; e2e; CRD inventory capture | CNEInstance Available=True; doctor green; CRD inventory recorded; **stop if 2.4.0 unachievable** |
-| 3 (~1 h) | GAIE v1.4.0 CRDs hashed; doctor extended | doctor green incl. inference CRDs |
-| 4 (~2 h) | M4: frr.conf + spine image; bgp manifests; apply in documented order; capture | BGP Established both sides; routes exchanged; immutability drill reproduces |
-| 5 (~2 h) | M5–M7 manifests + apps; capture | every apply verified end to end |
-| 6 (~2 h) | M8 three-CR path; blast before/after; tmctl capture | cascade all True; success == calls; convergence visible |
-| 7 (~3 h) | M9–M13 telemetry/set/optimizer pages | each optional module reproduces its verification |
-| 8 (~1 h) | All 8 faults: apply/diagnose/restore; reset apps; timing | fault table green; resets pristine |
-| 9 (~3 h) | Lab guides to the [guide contract](#7-lab-guides-appworld-format) + mkdocs/Pages pipeline | a cold reader following lab02 + lab08 reproducates the captured outputs |
-| 10 (~1 h) | Acceptance: teardown → two consecutive clean-clone bootstraps green; airgap-mode check; final PR | all [acceptance gates](#10-acceptance-gates) pass; PR open |
+| 1 | Flake skeleton + doctor; kindbnkctl pinned | `nix flake check` green; doctor honest |
+| 2 | **BNK 2.4.0 install path** (risk stage): init demo; keys placed; 2.4.0 override; e2e; CRD inventory capture | CNEInstance Available=True; doctor green; CRD inventory recorded; **stop if 2.4.0 unachievable** |
+| 3 | GAIE v1.4.0 CRDs hashed; doctor extended | doctor green incl. inference CRDs |
+| 4 | M4: frr.conf + spine image; bgp manifests; apply in documented order; capture | BGP Established both sides; routes exchanged; immutability drill reproduces |
+| 5 | M5–M7 manifests + apps; capture | every apply verified end to end |
+| 6 | M8 three-CR path; blast before/after; tmctl capture | cascade all True; success == calls; convergence visible |
+| 7 | M9–M13 telemetry/set/optimizer pages | each optional module reproduces its verification |
+| 8 | All 8 faults: apply/diagnose/restore; reset apps | fault table green; resets return pristine state |
+| 9 | Lab guides to the [guide contract](#7-lab-guides-appworld-format) + mkdocs/Pages pipeline | a reader with no prior context can follow lab02 and lab08 and reproduce the captured outputs |
+| 10 | Acceptance: teardown → two consecutive clean-clone bootstraps green; airgap-mode check; final PR | all [acceptance gates](#10-acceptance-gates) pass; PR open |
 
 Known-failure signature to recognize in Stage 2 (not a product error): pods Pending with
 `FailedScheduling: Insufficient memory` on the worker ⇒ the VM is under the reservation
@@ -582,9 +584,10 @@ required.
 
 - Between cohorts: version bumps only between cohorts; each bump is a reviewed flake.lock
   diff, tagged; FACILITATOR.md carries the ledger.
-- Per cohort: bootstrap the night before; doctor in the morning; timing tracker on;
-  contingency cuts per Table 4 timings when > 10 min behind; report dumped after class;
-  issue filed for anything that needed manual fixing.
+- Per cohort: bootstrap the night before; doctor in the morning; report dumped after
+  class; issue filed for anything that needed manual fixing.
+- Contingency cuts when a cohort runs long: drop to the module's demonstration mode or
+  skip optional modules (m10–m13) entirely — M8 is never cut (§3, hard rules).
 - T-minus rhythm: build on representative hardware two weeks out; dry-run with one or two
   engineers a week out (fix the three usual suspects: image pre-pull misses, status-wait too
   short, CRD version mismatch); Nix install + bootstrap on all classroom instances the day
