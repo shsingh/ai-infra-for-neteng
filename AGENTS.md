@@ -2,8 +2,11 @@
 
 This file is the operating contract for any autonomous coding agent working in this
 repository. Read it together with `PLAN.md`, which contains the full work plan, per-module
-specifications, pin set, and acceptance gates. If the two disagree, `PLAN.md` wins and the
-discrepancy must be raised as a repo issue.
+specifications, pins, and acceptance gates — and `course/README.md`, the entry point to
+the content system of record (the case study, the teaching model, and the per-module
+scripts that explain how and why the course teaches what it teaches). If files disagree,
+`PLAN.md` wins on build questions and `course/` wins on content questions; raise any
+real discrepancy as a repo issue.
 
 ## What this repository is
 
@@ -120,7 +123,7 @@ Update this section as stages complete, referencing [PLAN — Build order](PLAN.
 
 | Stage | Scope | Status |
 |---|---|---|
-| 0 | Repo created; AGENTS.md + PLAN.md + .gitignore committed | **done** |
+| 0 | Repo created; AGENTS.md + PLAN.md + .gitignore committed | **done** (pre-commit + governance live; merged) |
 | 1 | Flake skeleton + doctor | not started |
 | 2 | BNK 2.4.0 install path (risk stage; do first among build stages) | not started |
 | 3 | GAIE CRDs + verification plumbing | not started |

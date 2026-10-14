@@ -1,0 +1,38 @@
+site_name: AI Infrastructure for Network Engineers — Lab Guides
+site_description: Task-based lab guides for the BNK 2.4 hands-on course (self-bootstrapping lab repository)
+repo_url: https://github.com/shsingh/ai-infra-for-neteng
+repo_name: shsingh/ai-infra-for-neteng
+
+theme:
+  name: material
+  features:
+    - content.code.copy
+    - navigation.sections
+
+nav:
+  - Home: index.md
+  - Documentation pipeline: pipeline.md
+  - Labs:
+      - labs/lab01-kubernetes.md
+      - labs/lab02-install-bnk.md
+      - labs/lab03-routing-bgp.md
+      - labs/lab04-tenant-isolation.md
+      - labs/lab05-gateway-api.md
+      - labs/lab06-traditional-lb.md
+      - labs/lab07-ai-inference.md
+      - labs/lab08-observability.md
+      - labs/lab09-bnk-forge.md
+      - labs/lab10-oss-vs-bnk.md
+      - labs/lab11-ai-sec.md
+      - labs/lab12-shared-model-security.md
+
+docs_dir: docs
+site_dir: site
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - fenced_code
+  - tables
+  - toc:
+      permalink: true
