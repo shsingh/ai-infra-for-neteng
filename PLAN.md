@@ -1,7 +1,7 @@
 # PLAN.md — Lab Build Plan: AI Infrastructure for Network Engineers (BNK 2.4 Edition)
 
 Revision 1.0 — October 2026. Status: plan — the lab described here is specified in full and
-not yet built. Companion: `AGENTS.md` (operating contract for build agents).
+not yet built. Companion: [AGENTS.md](AGENTS.md) (operating contract for build agents).
 
 The course design document (not in this repo) defines 13 instructor-led modules for network
 engineers, taught through a three-planes narrative (management, control, data) and one
@@ -28,7 +28,7 @@ Rules for any agent executing this plan:
   into `keys/` (gitignored). Agents never create, request, or read them.
 - Every expected output in a guide must come from a captured run in `docs/expected/`.
 - Work happens on feature branches; PRs are reviewed and merged by the repository owner.
-- Stop conditions: see `AGENTS.md` rules 5–6. Never build on BNK < 2.4.0; never attempt arm64.
+- Stop conditions: see [AGENTS.md — Non-negotiable rules](AGENTS.md#non-negotiable-rules) rules 5–6. Never build on BNK < 2.4.0; never attempt arm64.
 
 ## 2. Lab architecture
 
@@ -89,7 +89,7 @@ are the first cuts when running a 4–5 h cohort. Total with optionals ≈ 7.6 h
 ## 4. Repository layout
 
 ```text
-ai-infra-for-network-engineers/
+ai-infra-for-neteng/
 ├── flake.nix                  # inputs: pinned nixpkgs + flake-utils; apps, devShell, checks
 ├── flake.lock                 # the pin: nixpkgs rev, kindbnkctl version + sha256, GAIE CRD source
 ├── README.md                  # student-facing: what this is, how to start
@@ -157,9 +157,12 @@ ai-infra-for-network-engineers/
   verify → print expected output) and is idempotent. All CR waits go through
   `course-libs.wait-for-status` (status polling + timeout + human-readable failure).
 - `devShells.default`: pinned kind, kubectl, helm, jq, yq, git; sets `KUBECONFIG`; shell
-  prompt `(ai-infra-lab)`. Students install nothing.
+  prompt `(ai-infra-neteng)`. Students install nothing.
 - `packages`: kindbnkctl binary (fetchurl + sha256 of a pinned GitHub release), GAIE CRD
   manifest set (hashed), FRR spine image, course libs.
+- `apps.docs`: renders the lab-guides site in place on the lab VM (`nix run .#docs`)
+  with mkdocs-material from the pinned toolchain — the site builds with no network access
+  and no CI dependency, so a fully offline VM can serve `docs/site/` directly.
 - `checks`: `nix flake check` passes on every PR — flake evaluation, manifest YAML parse,
   client-side dry-run, docs build.
 
@@ -376,8 +379,9 @@ Authoring rules (the honesty contract):
 - Captures record the deployed BNK pods, CRD apiVersions, and tmctl tables exactly as
   deployed and cross-reference the FACILITATOR.md version ledger.
 - Timing lines at the top of each lab come from Table 4 (target vs minimum viable).
-- Pipeline: markdown in `docs/labs/`, mkdocs-material, GitHub Actions builds on PR and
-  deploys Pages on main. Guides stay plain markdown (readable in-editor and on the web).
+- Pipeline: markdown in `docs/labs/`, mkdocs-material; rendered with `nix run .#docs` on
+  the lab VM (offline-capable — the pinned site toolchain comes from the flake) and by
+  GitHub Actions, which deploys Pages on main. The VM and CI produce identical output. Guides stay plain markdown (readable in-editor and on the web).
 
 ## 8. Environment contract (init, sync, reset)
 
@@ -394,8 +398,8 @@ Everything else arrives pinned through the flake.
 ### 8.2 Bootstrap
 
 ```text
-git clone https://github.com/shsingh/ai-infra-for-network-engineers.git
-cd ai-infra-for-network-engineers
+git clone https://github.com/shsingh/ai-infra-for-neteng.git
+cd ai-infra-for-neteng
 nix run .#bootstrap      # 10-20 min first run; streams progress
 nix develop              # pinned shell; KUBECONFIG set
 nix run .#doctor         # green board = ready to teach
@@ -417,7 +421,7 @@ Bootstrap order (each step checks-then-acts, idempotent, resume-safe):
 8. Smoke: `nix run .#doctor` full green board (nodes, TMM, CRDs incl. f5 + inference,
    spine reachable, VIP IPAM responding, eppNamespaces sane, end-to-end curl).
 
-Zero-clone variant: `nix run github:shsingh/ai-infra-for-network-engineers#bootstrap` — the
+Zero-clone variant: `nix run github:shsingh/ai-infra-for-neteng#bootstrap` — the
 app clones the repo itself before touching the cluster. The clone path stays the documented
 default.
 
@@ -445,6 +449,7 @@ nix run .#m12-attack             # seed jailbreak corpus through the Gateway
 nix run .#m13-hsl-tail           # follow the token-usage HSL stream
 nix run .#m13-breach             # drive a teaching-tier key past its budget (429 demo)
 nix run .#reset -- <module>
+nix run .#docs                   # render the lab-guides site locally (offline-capable)
 nix run .#teardown               # full destroy
 ```
 
@@ -453,7 +458,7 @@ hand-typed by students; `m8-blast` uses a fixed prompt corpus with shared prefix
 (reproducible cache behavior) and prints TTFT percentiles; `m8-blast-again` prints the
 per-pod tally; progress lines every 50 items or 30 s during blast and bootstrap.
 
-### 8.4 M8 verification (the money shot)
+### 8.4 M8 verification (primary evidence of AI-path correctness)
 
 Inside the TMM debug container:
 
@@ -487,7 +492,7 @@ Routing-CRD and F5EPP changes are delete-and-recreate, never patch. Cohort-grade
 
 ### 8.6 Classroom fleet
 
-One identical VM per student pair; any straggler re-runs bootstrap before Module 1; the
+One identical VM per student pair; any host that falls behind re-runs bootstrap before Module 1; the
 timing tracker runs on the facilitator's host only.
 
 ## 9. Build order (stages and exit gates)
@@ -543,7 +548,7 @@ required.
 | TMM restart churn during scenario runs | Some scenarios take minutes; TMM restarts mid-run | Apps wait on status, not wall-clock; capped wait tolerances |
 | F5 images amd64-only | Platform-mismatch pods Pending | x86_64 VM mandatory; preflight asserts amd64 |
 | Repo hygiene | Git repo inside a cloud-synced path corrupts history | Working clones live under the home directory, never in sync-client-managed trees |
-| Scope creep into shell scripts | A lab.sh sneaks in during debugging | No standalone scripts; apps only; repo conventions enforce |
+| Standalone scripts reintroduced during debugging | A lab.sh appears outside the Nix surface | No standalone .sh files; Nix apps only; reviewed in PRs |
 | Secrets exposure | Credential material committed | keys/ gitignored from first commit; CI check that no staged file comes from keys/ |
 
 ## 12. Operating the course afterwards
