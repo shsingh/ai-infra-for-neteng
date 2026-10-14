@@ -25,12 +25,15 @@ lands). Guide freezes follow the captured-output contract in `PLAN.md §7`. The 
 from `docs/` only; the `course/` sources are linked by path reference, not by site
 link, because they must remain viewable in-repo regardless of the rendered site.
 
-Theme note: the site uses the local wrapper theme `_themes/f5-neteng-theme` — a byte-faithful
-copy of `f5_sphinx_theme` 2.9.5 (Apache-2.0 headers preserved) whose only changes make it work
-outside the clouddocs.f5.com webserver root (GitHub Pages project sites): CSS/JS paths moved
-from webserver-root `/assets/...` to the theme-shipped `_static/...` files, Coveo cloud-search
-dropped (browser search only), and jQuery/mark.js loaded via cdnjs (Sphinx >= 6 no longer ships
-jQuery). Regenerate it only when bumping the upstream theme version.
+Theme note: the site uses the local wrapper theme `_themes/f5-neteng-theme` — derived from
+`f5_sphinx_theme` 2.9.5 (Apache-2.0 headers preserved) whose changes make it work
+outside the clouddocs.f5.com webserver root (GitHub Pages project sites) and fully
+offline: CSS/JS paths moved from webserver-root `/assets/...` to the theme-shipped
+`_static/...` files, Coveo cloud-search dropped (browser search only), analytics and
+remote header/footer fetches removed, and all browser assets (mermaid 11.12.1, d3 7.9.0,
+jQuery, mark.js, font-awesome, F5 fonts/images) vendored under `docs/_static/vendor/`,
+`docs/_static/fonts/`, and the theme static dirs — no CDN dependency on any page.
+Regenerate the vendored copies only when bumping the upstream theme or mermaid versions.
 
 Preview: `make html` then serve over http — `python3 -m http.server -d _build/html 8000`
 (not `file://` — mermaid and the sidebar scripts need http(s) to run; over file:// diagrams
