@@ -8,11 +8,16 @@ drills, and the version ledger.
 
 ## What you run, in order (first time)
 
-1. Provision the lab VM: 16 vCPU / 32 GB RAM / 160 GB disk, linux/amd64, Ubuntu 24.04 or
-   your RHEL-family estate image ([sizing rationale](PLAN.md#2-lab-architecture)).
-2. Install Docker Engine and Nix ([PLAN §8.1](PLAN.md#81-one-time-host-prep-the-only-manual-steps))
-   — the only two manual installs. Nix: the Determinate Systems installer, multi-user,
-   flakes enabled.
+1. Build/verify the **course image**: linux/amd64, Ubuntu 24.04 or your RHEL-family estate
+   image ([sizing rationale](PLAN.md#2-lab-architecture)) with Docker Engine and Nix
+   preinstalled ([PLAN §8.1](PLAN.md#81-one-time-host-prep-the-only-manual-steps) — the
+   only two baked-in installs; Nix via the Determinate Systems installer, multi-user,
+   flakes enabled). Every attendee instance boots **from this image**, and attendees
+   bootstrap their own lab on it at course start — you never start an environment for
+   them.
+2. Smoke-test the image yourself: boot one instance from it and run the full
+   [bootstrap flow](PLAN.md#82-bootstrap) end to end; record results in the version
+   ledger.
 3. Obtain the two credential files through F5 channels:
    - the FAR image-pull secret tarball,
    - the operator license JWT.
@@ -42,8 +47,9 @@ drills, and the version ledger.
   taught diagnosis paths is in [PLAN §6.4](PLAN.md#64-fault-injection-8-faults-apply--taught-diagnosis--exact-inverse-restore).
   Every fault has an exact-inverse restore; `nix run .#reset -- <module>` returns a
   module to pristine.
-- Between cohorts (same VM): `nix run .#teardown` then `nix run .#bootstrap`, or keep the
-  cluster warm and use `nix run .#reset -- <module>`.
+- Between cohorts: attendee instances are disposed and re-created fresh per seat; on a
+  persistent seat, `nix run .#teardown` then `nix run .#bootstrap`, or keep the cluster
+  warm and use `nix run .#reset -- <module>`.
 
 ## Airgapped or restricted rooms
 

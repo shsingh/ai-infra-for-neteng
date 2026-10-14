@@ -1,0 +1,5 @@
+title = "ai-infra-for-neteng secret scanning"
+
+[allowlist]
+  description = "Vendored third-party theme files are scanned upstream, not here"
+  paths = ["(?i)docs/_themes/.*", "^keys/"]

@@ -390,25 +390,41 @@ Authoring rules (the honesty contract):
 
 ## 8. Environment contract (init, sync, reset)
 
-### 8.1 One-time host prep (the only manual steps)
+### 8.1 The attendee-instance model
 
-Two packages on the stock Linux image (documented in README with copy-paste lines):
+Every attendee receives their own freshly booted lab instance at the start of the course —
+the facilitator does not stand environments up for them. An instance is a clean linux/amd64
+VM with web or CLI access (SSH or console); the attendee bootstraps the lab from the public
+repository themselves, on their own instance, in the opening minutes of the course. Two
+properties make this work:
 
-1. Docker Engine (the distro package).
-2. Nix with flakes enabled, via the Determinate Systems installer (multi-user; no root at
-   runtime afterwards). This is the one imperative step the flake cannot absorb.
+1. **The image bakes the tool base.** The estate (or course) image ships Docker Engine and
+   Nix with flakes enabled (Determinate Systems installer, multi-user) — nothing else; the
+   flake pins and delivers every other tool. This is host-prep done once per image build,
+   not per attendee or per cohort.
+2. **The repository is the only other input.** Everything else the attendee needs arrives
+   through `git clone` + `nix run .#bootstrap` — so the same flow works identically for a
+   self-paced remote attendee over SSH and for an in-room attendee with browser + console
+   access.
 
-Everything else arrives pinned through the flake.
+The facilitator runs no environment for attendees: their own seat is only for
+demonstration, break-fix injection, and the post-class report.
 
 ### 8.2 Bootstrap
+
+Run by each attendee on their own instance at course start (CLI/SSH/console path):
 
 ```text
 git clone https://github.com/shsingh/ai-infra-for-neteng.git
 cd ai-infra-for-neteng
 nix run .#bootstrap      # 10-20 min first run; streams progress
 nix develop              # pinned shell; KUBECONFIG set
-nix run .#doctor         # green board = ready to teach
+nix run .#doctor         # green board = your lab is ready
 ```
+
+Web-access attendees do the same inside the browser terminal (or via their platform's
+console shell); the guides only ever assume a shell — the way it is reached (SSH client,
+web terminal, or console) does not change any step.
 
 Bootstrap order (each step checks-then-acts, idempotent, resume-safe):
 
@@ -416,7 +432,9 @@ Bootstrap order (each step checks-then-acts, idempotent, resume-safe):
    reachable; human message and stop below the floor.
 2. Nix check: if Nix/flakes absent, print the exact installer command and stop — never
    installs Nix itself.
-3. Keys check: FAR tarball and JWT present in `keys/`; else human message → FACILITATOR.md.
+3. Keys check: FAR tarball and JWT present in `keys/`; else a human message pointing at
+   FACILITATOR.md (the credentials are pre-baked into the image for course VMs, so the
+   per-attendee bootstrap needs no manual key handling).
 4. Image pre-pull: BNK release-manifest images, llm-d-inference-sim, FRR spine, nginx,
    curl. With `--offline`, loads from the [airgap bundle](#821-offline-bootstrap-self-sustained-vm) instead and skips the
    network entirely.
@@ -425,7 +443,8 @@ Bootstrap order (each step checks-then-acts, idempotent, resume-safe):
 6. GAIE CRDs applied from the hashed v1.4.0 source; verified registered.
 7. Fabric spine up on the kind docker network.
 8. Smoke: `nix run .#doctor` full green board (nodes, TMM, CRDs incl. f5 + inference,
-   spine reachable, VIP IPAM responding, eppNamespaces sane, end-to-end curl).
+   spine reachable, VIP IPAM responding, eppNamespaces sane, end-to-end curl) — the
+   attendee's signal that their lab is ready for Module 1.
 
 Zero-clone variant: `nix run github:shsingh/ai-infra-for-neteng#bootstrap` evaluates and
 runs the flake straight from the fetched source, no local checkout needed. The clone path
@@ -523,9 +542,14 @@ Routing-CRD and F5EPP changes are delete-and-recreate, never patch. Cohort-grade
 
 ### 8.6 Classroom fleet
 
-One identical VM per student pair; any host that falls behind re-runs bootstrap before
-Module 1. The facilitator's host is the control seat: doctor, break-fix injection, and
-the post-class report.
+Every attendee owns a dedicated instance (no sharing by default — a pair-share fallback
+is fine on constrained deliveries): identical image, identical repository flow, so
+attendee seats are interchangeable. Any instance that falls behind re-runs bootstrap
+before Module 1 — its owner, not the facilitator, does it. The facilitator's own instance
+is the control seat for the room: showing steps on the shared screen, injecting
+[break-fix faults](#64-fault-injection-8-faults-apply--taught-diagnosis--exact-inverse-restore)
+into **their own** environment (never touching an attendee's instance), and producing the
+post-class report.
 
 ## 9. Build order (stages and exit gates)
 
@@ -587,8 +611,9 @@ required.
 
 - Between cohorts: version bumps only between cohorts; each bump is a reviewed flake.lock
   diff, tagged; FACILITATOR.md carries the ledger.
-- Per cohort: bootstrap the night before; doctor in the morning; report dumped after
-  class; issue filed for anything that needed manual fixing.
+- Per cohort: verify the course image still bootstraps cleanly (one smoke instance);
+  attendees bootstrap their own instances at course start; the facilitator reports on
+  their own instance after class; issue filed for anything that needed manual fixing.
 - Contingency cuts when a cohort runs long: drop to the module's demonstration mode or
   skip optional modules (m10–m13) entirely — M8 is never cut (§3, hard rules).
 - T-minus rhythm: build on representative hardware two weeks out; dry-run with one or two

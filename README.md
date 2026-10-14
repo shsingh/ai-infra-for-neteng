@@ -12,10 +12,12 @@ Everything is declarative: custom resources in Git, applied by hand, verified th
 status conditions and `tmctl` tables. The lab environment boots itself from this
 repository on one Linux VM.
 
-## Quickstart (facilitator or self-paced student)
+## Quickstart (every attendee / self-paced student)
 
-On a Linux amd64 VM with Docker and Nix installed (16 vCPU / 32 GB RAM / 160 GB disk
-recommended; [sizing](PLAN.md#2-lab-architecture)):
+Each course attendee receives a freshly booted lab instance (linux/amd64 with Docker and
+Nix preinstalled; 16 vCPU / 32 GB RAM / 160 GB disk recommended;
+[sizing](PLAN.md#2-lab-architecture)) and bootstraps their own environment at course
+start — over SSH, a web terminal, or a console, identically:
 
 ```text
 git clone https://github.com/shsingh/ai-infra-for-neteng.git
@@ -42,6 +44,30 @@ Offline/airgapped delivery is supported end to end:
 | [docs/course/](docs/course/README.md) | The content system of record: case study, teaching model, per-module scripts |
 | `apps/`, `manifests/`, `fabric/`, `pkgs/` (built in stages) | Nix apps, lab manifests, FRR fabric peer, pinned packages |
 | `docs/` (built in stages) | Student lab guides + the locally renderable site (`nix run .#docs`) |
+
+## The lab in one picture
+
+```mermaid
+graph TB
+  subgraph LAB["Attendee lab instance — one linux/amd64 VM (Docker + Nix), bootstrapped from this repo"]
+    direction TB
+    shell["nix develop — pinned kubectl / kind / helm / jq / yq"]
+    subgraph KIND["kind cluster (two nodes)"]
+      CP["demo-control-plane"]
+      WK["demo-worker (app=f5-tmm)"]
+      TMM["f5-tmm — forwarding (data)"]
+      CTR["f5-cne / FLO / FIC — control"]
+      SIM["model pool: llm-d-inference-sim ×3"]
+    end
+    SPINE["frr-spine container — fabric peer AS 65110"]
+  end
+  U["attendee: web terminal / SSH / console"] --> shell
+  shell -->|kubectl apply manifests| KIND
+  TMM <-->|"eBGP · Multus net1"| SPINE
+```
+
+Full environment diagrams (three planes, module arc, offline flow, build stages):
+[docs/lab-environment.md](docs/lab-environment.md).
 
 ## The modules
 

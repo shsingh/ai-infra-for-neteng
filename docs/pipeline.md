@@ -24,3 +24,14 @@ Verify before pushing (from `docs/`): `make html` (or `nix run .#docs` once the 
 lands). Guide freezes follow the honesty contract in `PLAN.md §7`. The site renders
 from `docs/` only; the `course/` sources are linked by path reference, not by site
 link, because they must remain viewable in-repo regardless of the rendered site.
+
+Theme note: the site uses the local wrapper theme `_themes/f5-neteng-theme` — a byte-faithful
+copy of `f5_sphinx_theme` 2.9.5 (Apache-2.0 headers preserved) whose only changes make it work
+outside the clouddocs.f5.com webserver root (GitHub Pages project sites): CSS/JS paths moved
+from webserver-root `/assets/...` to the theme-shipped `_static/...` files, Coveo cloud-search
+dropped (browser search only), and jQuery/mark.js loaded via cdnjs (Sphinx >= 6 no longer ships
+jQuery). Regenerate it only when bumping the upstream theme version.
+
+Preview: `make html` then serve over http — `python3 -m http.server -d _build/html 8000`
+(not `file://` — mermaid and the sidebar scripts need http(s) to run; over file:// diagrams
+show as code, exactly like viewing the markdown on GitHub).
