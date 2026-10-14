@@ -39,7 +39,7 @@ Offline/airgapped delivery is supported end to end:
 | [PLAN.md](PLAN.md) | The full build plan: architecture, pins, per-manifest specs, stages, acceptance gates |
 | [FACILITATOR.md](FACILITATOR.md) | Run order, credentials, fault-drill commands, version ledger |
 | [CONTRIBUTING.md](CONTRIBUTING.md) / [SECURITY.md](SECURITY.md) | Working agreement (Conventional Commits, signed commits) / private vulnerability reporting |
-| [course/](course/README.md) | The content system of record: case study, teaching model, per-module scripts |
+| [docs/course/](docs/course/README.md) | The content system of record: case study, teaching model, per-module scripts |
 | `apps/`, `manifests/`, `fabric/`, `pkgs/` (built in stages) | Nix apps, lab manifests, FRR fabric peer, pinned packages |
 | `docs/` (built in stages) | Student lab guides + the locally renderable site (`nix run .#docs`) |
 
@@ -49,7 +49,7 @@ Ten core modules (Kubernetes for network engineers → install → BGP/VRF/EVPN 
 Gateway API → traditional LB → AI inference routing with the endpoint picker →
 observability) plus four optional extensions (a management GUI, an honest OSS-vs-buy
 walk, prompt screening at the edge, shared-model metering and protection). The narrative
-thread and per-module scripts: [course/case-study.md](course/case-study.md).
+thread and per-module scripts: [docs/course/case-study.md](docs/course/case-study.md).
 
 ## Status
 

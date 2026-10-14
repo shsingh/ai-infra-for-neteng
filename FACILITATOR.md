@@ -2,7 +2,7 @@
 
 For the person standing the environment up and running the room. The student-facing
 content lives in `docs/labs/` (rendered site); the content system of record lives in
-[`course/`](course/README.md); the build spec is [`PLAN.md`](PLAN.md); the agent contract
+[`docs/course/`](docs/course/README.md); the build spec is [`PLAN.md`](PLAN.md); the agent contract
 is [`AGENTS.md`](AGENTS.md). This file is the operational twin: run order, credentials,
 drills, and the version ledger.
 
@@ -33,7 +33,7 @@ drills, and the version ledger.
 ## Running the day
 
 - Before students arrive: `nix run .#doctor` green; projector + printed handout from
-  [course/planes-and-analogies.md](course/planes-and-analogies.md) (concept-mapping table
+  [course/planes-and-analogies.md](docs/course/planes-and-analogies.md) (concept-mapping table
   + analogy grid).
 - During: students keep their own pace via the guides; apps handle waits, verification,
   traffic, and faults — students hand-apply every manifest. Guides carry the expected
@@ -84,7 +84,7 @@ grep -Ei "f5|inference"`). If the override cannot deliver 2.4.0, the build stops
 is a non-negotiable stop condition ([plan risk table](PLAN.md#11-risk-register-first-build)).
 
 Content source: what each module teaches lives in
-[`course/modules/`](course/README.md) — update content there, not in the guides; the
+[`docs/course/modules/`](docs/course/README.md) — update content there, not in the guides; the
 guides render from it.
 
 ## After each cohort

@@ -2,10 +2,10 @@
 
 This file is the operating contract for any autonomous coding agent working in this
 repository. Read it together with `PLAN.md`, which contains the full work plan, per-module
-specifications, pins, and acceptance gates — and `course/README.md`, the entry point to
+specifications, pins, and acceptance gates — and `docs/course/README.md`, the entry point to
 the content system of record (the case study, the teaching model, and the per-module
 scripts that explain how and why the course teaches what it teaches). If files disagree,
-`PLAN.md` wins on build questions and `course/` wins on content questions; raise any
+`PLAN.md` wins on build questions and `docs/course/` wins on content questions; raise any
 real discrepancy as a repo issue.
 
 ## What this repository is
@@ -43,7 +43,8 @@ Build, in order, and verify against a running environment:
    course order (`manifests/`), an FRR fabric-peer container (`fabric/`), fault injection
    (`nix run .#break-fix`), and a bootstrap app that takes a bare VM to a green doctor board.
 2. **The lab guides** — one guide per module under `docs/labs/`, in the task-based format
-   defined in [PLAN — Lab guides](PLAN.md#7-lab-guides-appworld-format), rendered by mkdocs-material to GitHub Pages via GitHub Actions and locally on the lab VM (`nix run .#docs`, offline-capable).
+   defined in [PLAN — Lab guides](PLAN.md#7-lab-guides-appworld-format), rendered by Sphinx (f5_sphinx_theme — the AppWorld/clouddocs look) to GitHub Pages
+   via GitHub Actions and locally on the lab VM (`nix run .#docs`, offline-capable).
 3. **The operating contract** — bootstrap / sync / reset / teardown commands as specified in
    [PLAN — Environment contract](PLAN.md#8-environment-contract-init-sync-reset), plus `README.md` (student quickstart) and `FACILITATOR.md` (T-minus checklist,
    version ledger, credentials how-to).
@@ -96,7 +97,8 @@ ai-infra-for-neteng/
 ├── devShells/default.nix
 ├── manifests/                # 00..15 + bgp/ — plain YAML, applied by hand, in course order
 ├── fabric/                   # spine image derivation + frr.conf
-├── docs/                     # mkdocs.yml, index.md, labs/lab01..lab12, expected/
+├── docs/                     # sphinx site (conf.py, index.rst) + course/ (content
+│                             # system of record) + labs/ + expected/
 └── reports/                  # gitignored: build + scenario reports
 ```
 
