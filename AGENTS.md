@@ -79,7 +79,7 @@ Build, in order, and verify against a running environment:
    least every 50 items or 30 seconds, with success and fail counts.
 9. **Immutability.** The routing CRDs and `poolRef` on F5EPP are immutable: changes are
    delete-and-recreate. Tooling implements this; nothing patches these fields in place.
-10. **Honest scoping.** Features that are Early Access (semantic caching) or outside the
+10. **Accurate scoping.** Features that are Early Access (semantic caching) or outside the
     demo-mode shape (DPU, SR-IOV, GRPCRoute) appear as demo/slides material only; guides say
     so explicitly.
 

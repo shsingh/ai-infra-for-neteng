@@ -4,7 +4,7 @@ Revision 1.0 — October 2026. Status: plan — the lab described here is specif
 not yet built. Companion: [AGENTS.md](AGENTS.md) (operating contract for build agents).
 
 The course defines 13 instructor-led modules for network engineers, taught through a
-three-planes narrative (management, control, data) and one university case study
+three-planes model (management, control, data) and one university case study
 ([docs/course/](docs/course/README.md) — the content system of record: case study, teaching model,
 per-module scripts). Everything in the course is declarative: custom resources in Git,
 applied by students by hand, verified through status conditions and TMM `tmctl` tables.
@@ -77,7 +77,7 @@ host, so worker reservations must fit the Docker daemon's allocation — hence t
 | M6 Gateway API (VIP to Route) | `01-demo-app`, `02-gateway-httproute`, `03-irule-cneirule`, m6 apps, fault `m6-route-ns` | labs/lab05-gateway-api.md |
 | M7 Traditional LB (L4Route, egress, firewall) | `04-l4route-gateway`, `05-egress-gateway`, `06-fw-policy`, m7 apps, fault `m7-l4port` | labs/lab06-traditional-lb.md |
 | M8 AI ingress (InferencePool, F5EPP) | `07-ai-sim`, `08-f5epp`, `09-inferencepool`, `10-httproute-inference`, m8 blast + tmctl apps, faults `m8-epp-selector`, `m8-pool-ports` | labs/lab07-ai-inference.md |
-| M9 Observability + finale | `m9-telemetry`, `m9-finale`, `docs/expected/` captures | labs/lab08-observability.md |
+| M9 Observability + consolidated review | `m9-telemetry`, `m9-drill`, `docs/expected/` captures | labs/lab08-observability.md |
 | M10 bnk-forge GUI (optional) | runbook + screenshots | labs/lab09-bnk-forge.md |
 | M11 Can OSS do this? (optional) | argument-table page (no cluster work) | labs/lab10-oss-vs-bnk.md |
 | M12 AI-sec prompt screening (optional) | `11-nova-deployment`, `12-nova-rules`, `13-httproute-ai-sec`, `m12-attack` app | labs/lab11-ai-sec.md |
@@ -86,7 +86,7 @@ host, so worker reservations must fit the Docker daemon's allocation — hence t
 Hard rules from the course: M8 is never cut entirely; M4/M5 absorb overruns; optional
 modules (m10–m13) are the first cuts when a cohort runs long — each optional module is
 also self-contained enough to run as a take-home exercise. Pacing decisions rest with the
-facilitator, guided by the module narrative beats (which parts of a module are
+facilitator, guided by the module scenario sections (which parts of a module are
 demonstrable without the hands-on portion) rather than by a stopwatch.
 
 ## 4. Repository layout
@@ -378,7 +378,7 @@ The guide template (from the F5 AppWorld 2026 AI labs repo [18]) — one guide p
 Class-wide pages: index (lab environment, access, lab variables: host address, KUBECONFIG
 location, VIP ranges, tenant list) and a closing page. Nav order follows Table 4.
 
-Authoring rules (the honesty contract):
+Authoring rules (the captured-output contract):
 
 - Every command in a guide executes against the running lab before the guide is frozen; its
   output is captured into `docs/expected/`. Invented outputs are a defect.
@@ -497,7 +497,7 @@ nix run .#m8-pool                # apply InferencePool; rewire HTTPRoute backend
 nix run .#m8-blast-again         # per-pod tally + TTFT comparison
 nix run .#m8-tmctl               # print the four tmctl tables (§6.1 verification)
 nix run .#m9-telemetry           # curated kubectl/jsonpath 'show' set + EPP Prom metrics
-nix run .#m9-finale -- <fault-id>
+nix run .#m9-drill -- <fault-id
 nix run .#m12-attack             # seed jailbreak corpus through the Gateway
 nix run .#m13-hsl-tail           # follow the token-usage HSL stream
 nix run .#m13-breach             # drive a teaching-tier key past its budget (429 demo)

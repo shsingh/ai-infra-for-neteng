@@ -44,7 +44,7 @@ graph LR
   C --> D["Model pods<br/>llm-d-inference-sim pool"]
 ```
 
-## Module walk (the course arc)
+## Module walk (course sequence)
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"primaryColor":"transparent","primaryBorderColor":"#1d9cd3","lineColor":"#04395d","clusterBkg":"transparent","clusterBorder":"#04395d","fontFamily":"-apple-system, Segoe UI, Roboto, sans-serif"},"flowchart":{"curve":"basis"}}}%%
@@ -55,7 +55,7 @@ graph LR
   M5 --> M6["m06<br/>Gateway API:<br/>VIP to route"]
   M6 --> M7["m07<br/>L4Route, egress,<br/>firewall"]
   M7 --> M8["m08<br/>InferencePool<br/>+ F5EPP"]
-  M8 --> M9["m09<br/>observability<br/>+ finale"]
+  M8 --> M9["m09<br/>observability<br/>+ review"]
   M8 -.-> M10["m10 GUI<br/>(optional)"]
   M8 -.-> M11["m11 OSS<br/>vs buy(?)<br/>(optional)"]
   M8 -.-> M12["m12 prompt<br/>screening<br/>(optional)"]

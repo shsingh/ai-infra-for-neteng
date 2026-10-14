@@ -4,6 +4,6 @@
 > repository build plan (`PLAN.md`, §9). Its content contract is the module script in
 > `course/modules/` (m-file listed below), and every expected output comes from a
 > captured run stored under `docs/expected/` — a guide is only frozen after its
-> commands have executed against the running lab (`PLAN.md` §7, the honesty contract).
+> commands have executed against the running lab (`PLAN.md` §7, the captured-output contract).
 >
 > Module script: `course/modules/m08.md`

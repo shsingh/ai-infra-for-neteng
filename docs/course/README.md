@@ -8,17 +8,17 @@ combination with captured outputs (`docs/expected/`).
 ## Read order for a build agent
 
 1. `AGENTS.md` (repo contract) and `PLAN.md` (build plan: what to build, pins, gates).
-2. `course/case-study.md` — the Meridian University narrative every module sits inside.
+2. `course/case-study.md` — the Meridian University scenario every module sits inside.
 3. `course/planes-and-analogies.md` — the teaching model: the three-planes spine, the
-   LTM/Kubernetes concept-mapping tables, and the known cognitive traps of this audience.
-4. `course/modules/m01.md` … `m13.md` — the module script: narrative beat, lecture targets,
+   LTM/Kubernetes concept-mapping tables, and the recurring pitfalls of this audience.
+4. `course/modules/m01.md` … `m13.md` — the module script: scenario, lecture targets,
    hands-on steps, verification, break-fix drill, planes check, guide mapping.
 
 ## Why this exists
 
 An infrastructure plan can say *what* to build (manifests, apps, fabric). Students and the
-facilitator need *why* and *in what order the learning happens*: the work order that motivates
-each module, the analogies that make Kubernetes land for a device-oriented audience, and the
+facilitator need *why* and *in what order the learning happens*: the scenario that motivates
+each module, the analogies that map Kubernetes onto a device-oriented audience's experience, and the
 one request's journey across all three planes. Those live here, in markdown, versioned with
 the code — not in an external document.
 
