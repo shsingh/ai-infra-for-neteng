@@ -1,0 +1,4 @@
+sphinx>=7.4,<9
+f5-sphinx-theme==2.9.5
+myst-parser>=3,<5
+sphinx-copybutton

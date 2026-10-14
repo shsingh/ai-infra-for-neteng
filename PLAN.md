@@ -5,7 +5,7 @@ not yet built. Companion: [AGENTS.md](AGENTS.md) (operating contract for build a
 
 The course defines 13 instructor-led modules for network engineers, taught through a
 three-planes narrative (management, control, data) and one university case study
-([course/](course/README.md) — the content system of record: case study, teaching model,
+([docs/course/](docs/course/README.md) — the content system of record: case study, teaching model,
 per-module scripts). Everything in the course is declarative: custom resources in Git,
 applied by students by hand, verified through status conditions and TMM `tmctl` tables.
 This plan specifies the repository that makes the lab real and self-bootstrapping. The published
@@ -65,7 +65,7 @@ host, so worker reservations must fit the Docker daemon's allocation — hence t
 
 ## 3. Course-to-build map
 
-**Table 4: Modules mapped to repo deliverables** (content source of record: [course/modules](course/modules/m01.md); this table maps the repo outputs only)
+**Table 4: Modules mapped to repo deliverables** (content source of record: [docs/course/modules/](docs/course/modules/m01.md); this table maps the repo outputs only)
 
 | Module | Build outputs | Lab guide |
 |---|---|---|
@@ -145,9 +145,11 @@ ai-infra-for-neteng/
 ├── fabric/
 │   ├── default.nix            # spine image derivation + run
 │   └── frr.conf               # router bgp 65110, neighbor = kind node, redistribute kernel
-├── docs/
-│   ├── mkdocs.yml             # lab-guides site (mkdocs-material)
-│   ├── index.md               # class intro: environment, access, lab variables
+├── docs/                      # rendered site + content system of record
+│   ├── conf.py, index.rst     # Sphinx config (f5_sphinx_theme — the AppWorld pattern)
+│   ├── Makefile, requirements.txt
+│   ├── course/                # content source of record: case-study.md,
+│   │                          #   planes-and-analogies.md, modules/m01..m13.md
 │   ├── labs/lab01..lab12      # one md per module (Table 4)
 │   └── expected/              # captured outputs; the ONLY source of expected results
 └── reports/                   # gitignored: build + scenario reports
@@ -164,7 +166,8 @@ ai-infra-for-neteng/
 - `packages`: kindbnkctl binary (fetchurl + sha256 of a pinned GitHub release), GAIE CRD
   manifest set (hashed), FRR spine image, course libs.
 - `apps.docs`: renders the lab-guides site in place on the lab VM (`nix run .#docs`)
-  with mkdocs-material from the pinned toolchain — the site builds with no network access
+  with the pinned Sphinx toolchain (f5-sphinx-theme, the AppWorld pattern) — the site
+  builds with no network access
   and no CI dependency, so a fully offline VM can serve `docs/site/` directly.
 - `checks`: `nix flake check` passes on every PR — flake evaluation, manifest YAML parse,
   client-side dry-run, docs build.
@@ -381,7 +384,7 @@ Authoring rules (the honesty contract):
 - Screenshots come from actual lab runs.
 - Captures record the deployed BNK pods, CRD apiVersions, and tmctl tables exactly as
   deployed and cross-reference the FACILITATOR.md version ledger.
-- Pipeline: markdown in `docs/labs/`, mkdocs-material; rendered with `nix run .#docs` on
+- Pipeline: markdown in `docs/labs/` (Sphinx + MyST + f5_sphinx_theme); rendered with `nix run .#docs` on
   the lab VM (offline-capable — the pinned site toolchain comes from the flake) and by
   GitHub Actions, which deploys Pages on main. The VM and CI produce identical output. Guides stay plain markdown (readable in-editor and on the web).
 
@@ -540,7 +543,7 @@ does not proceed past a red gate.
 | 6 | M8 three-CR path; blast before/after; tmctl capture | cascade all True; success == calls; convergence visible |
 | 7 | M9–M13 telemetry/set/optimizer pages | each optional module reproduces its verification |
 | 8 | All 8 faults: apply/diagnose/restore; reset apps | fault table green; resets return pristine state |
-| 9 | Lab guides to the [guide contract](#7-lab-guides-appworld-format) + mkdocs/Pages pipeline | a reader with no prior context can follow lab02 and lab08 and reproduce the captured outputs |
+| 9 | Lab guides to the [guide contract](#7-lab-guides-appworld-format) + Sphinx/Pages pipeline | a reader with no prior context can follow lab02 and lab08 and reproduce the captured outputs |
 | 10 | Acceptance: teardown → two consecutive clean-clone bootstraps green; airgap-mode check; final PR | all [acceptance gates](#10-acceptance-gates) pass; PR open |
 
 Known-failure signature to recognize in Stage 2 (not a product error): pods Pending with
@@ -560,7 +563,7 @@ required.
 | G5 Classic LB | L4Route TCP probe; egress identity verified; firewall block with streamed log |
 | G6 AI path | F5EPP cascade all True; tmctl tables show schedule_successes == schedule_calls; blast runs show cache-affinity convergence + TTFT variance drop |
 | G7 Faults | each fault: apply → symptom → taught diagnosis demonstrated → restore verified |
-| G8 Guides | every guide command executed against the cluster; outputs come from docs/expected/; mkdocs build green |
+| G8 Guides | every guide command executed against the cluster; outputs come from docs/expected/; Sphinx docs build green |
 | G9 Contract | two consecutive clean-clone bootstraps green; teardown symmetric; airgap path runs |
 | G10 Governance | PR open; reviewed and merged by the repository owner |
 
