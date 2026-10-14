@@ -39,7 +39,7 @@ proposed, reviewed, and merged, and what the CI gates enforce.
 - Manifests validate against the deployed CRDs, not documentation alone
   ([PLAN §6](PLAN.md#6-manifest-specifications)).
 - Features labelled Early Access stay demo-only in guides and apps
-  ([the honesty rule](docs/course/planes-and-analogies.md#honest-scoping-standing-rule)).
+  ([the scoping rule](docs/course/planes-and-analogies.md#scoping-discipline-standing-rule)).
 
 ## CI gates
 

@@ -1,6 +1,6 @@
 # FACILITATOR.md — Course Operations
 
-For the person standing the environment up and running the room. The student-facing
+For the person provisioning the environment and running the session. The student-facing
 content lives in `docs/labs/` (rendered site); the content system of record lives in
 [`docs/course/`](docs/course/README.md); the build spec is [`PLAN.md`](PLAN.md); the agent contract
 is [`AGENTS.md`](AGENTS.md). This file is the operational twin: run order, credentials,
@@ -52,7 +52,7 @@ drills, and the version ledger.
   persistent seat, `nix run .#teardown` then `nix run .#bootstrap`, or keep the cluster
   warm and use `nix run .#reset -- <module>`.
 
-## Airgapped or restricted rooms
+## Airgapped or restricted delivery venues
 
 Produce the offline bundle once, on any connected host
 ([PLAN §8.2.1](PLAN.md#821-offline-bootstrap-self-sustained-vm)):

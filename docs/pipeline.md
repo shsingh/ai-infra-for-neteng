@@ -21,7 +21,7 @@ Two render paths, identical output:
 
 
 Verify before pushing (from `docs/`): `make html` (or `nix run .#docs` once the flake
-lands). Guide freezes follow the honesty contract in `PLAN.md §7`. The site renders
+lands). Guide freezes follow the captured-output contract in `PLAN.md §7`. The site renders
 from `docs/` only; the `course/` sources are linked by path reference, not by site
 link, because they must remain viewable in-repo regardless of the rendered site.
 

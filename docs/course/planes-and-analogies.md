@@ -1,9 +1,9 @@
 # Teaching Model — Planes, Analogies, and the Audience
 
-## Who sits in the room
+## Intended audience
 
 Cisco/Juniper network engineers, fluent in IP/MPLS and BIG-IP LTM, new to Kubernetes. They
-know cold: TCP/IP, BGP/OSPF/IS-IS, MPLS L3VPN/VPLS, VXLAN/EVPN, ACLs, QoS/DSCP, and BIG-IP
+are fluent in: TCP/IP, BGP/OSPF/IS-IS, MPLS L3VPN/VPLS, VXLAN/EVPN, ACLs, QoS/DSCP, and BIG-IP
 LTM (virtual servers, pools, monitors, SNAT/automap, iRules, profiles, HA, tmsh). Many also
 operate declarative estates already (ACI/FMC policy models, Junos Evolved, config-as-code
 pipelines) and most have touched public cloud (AWS ALB/NLB, Azure LB, tenants/subscriptions).
@@ -25,7 +25,7 @@ memory — that recall is the graduation test.
 
 ## Concept mapping (core teaching artifact — print as a one-page handout)
 
-| Traditional construct | Kubernetes / BNK 2.4 analog | The honest caveat (teach the break) |
+| Traditional construct | Kubernetes / BNK 2.4 analog | Where the analogy stops (taught explicitly) |
 |---|---|---|
 | Device (chassis) | Node (host) / pod (the forwarding engine runs as a pod) | The "box" is software; scale = replicas, not chassis |
 | Management plane (SSH/tmsh) | kubectl + CRDs + controllers | No CLI login to "the device"; config is declarative YAML |
@@ -41,7 +41,7 @@ memory — that recall is the graduation test.
 | Route reflector / fabric | The campus fabric stays in place; peering is configured via BGP CRDs | Kubernetes does not replace the fabric |
 | Console/LED status | kubectl get, CR status fields, pod logs | "Show commands" become kubectl get/describe/logs |
 
-## The analogy grid (second handout — use whichever column lands)
+## The analogy grid (second handout — use the column most familiar to the student)
 
 | Construct | BIG-IP/tmsh | Cisco/Juniper | Public cloud | Kubernetes |
 |---|---|---|---|---|
@@ -50,11 +50,12 @@ memory — that recall is the graduation test.
 | Declarative config input | load sys config from-terminal | Commit-style config; config-as-code CI | Infrastructure-as-code plan/apply | kubectl apply -f — the file is the config, the API reconciles it |
 | Object model | Virtual server, pool, monitor | IOS/Junos stanzas | ALB listener + rules; frontend IP + LB rules | CRs: GlobalRoutingConfig, Gateway, HTTPRoute — stanzas in YAML |
 
-The old-school BIG-IP point deserves saying out loud: tmsh was already half-declarative —
-a complete config text merged against current state. The new world moves that text to YAML
-files in Git and lets a controller do the merge. Same muscle memory, stronger rails.
+A relevant precedent: tmsh was already partly declarative — `load sys config from-terminal`
+accepts a complete config text and merges it against current state. BNK moves that text to
+YAML files in Git and delegates the merge to a controller. The operator habit transfers
+directly; the review and rollback path is stronger.
 
-## The six traps that sink this audience (teach explicitly)
+## Six recurring pitfalls for this audience (teach explicitly)
 
 1. No per-device configuration. No one logs into the forwarding pod to configure it; the
    declarative path is writing CRs, which controllers reconcile. Debugging = reading CR status and pod logs.
@@ -64,7 +65,7 @@ files in Git and lets a controller do the merge. Same muscle memory, stronger ra
    separate, hardware-grade plane attached via VLANs/SR-IOV (virtio in demo mode). Two
    routing stacks coexist — knowing which one carries what is a core skill.
 4. Names are namespaces. Every CR is namespace-scoped; a "missing VIP" is usually a wrong
-   namespace, not a misconfig. In 2.4 this gets teeth: the F5EPP reconciliation only
+   namespace, not a misconfig. In 2.4 this carries an enforcement point: the F5EPP reconciliation only
    happens in namespaces listed in `CNEInstance.spec.eppNamespaces`.
 5. Health is declarative. kubectl get shows desired vs observed; learn to read status
    conditions as the new "session up" signal.
@@ -78,7 +79,7 @@ files in Git and lets a controller do the merge. Same muscle memory, stronger ra
   language; the campus fabric is unchanged.
 - Every module: a short concept talk with the relevant mapping-slice → guided hands-on
   typed by the student (never pasted blindly) → verification checkpoint → one break-fix
-  drill → one narrative beat advancing the case study.
+  drill → one scenario step that advances the case study.
 - Deliberately reuse networker reflexes: BGP neighbor states, show-equivalents (kubectl
   exec + tcpdump in the TMM pod), ACL logic.
 - End every module with the planes check (above).
@@ -93,10 +94,10 @@ round-robin pick between identical-looking pods can mean the difference between 
 continuation and re-processing a long prompt. Cache hit rate is the scarce resource;
 queue depth and running-request counts are the visible signals. The endpoint picker reads
 both (per-request, body-inclusive, via the ext_proc consult) and steers to the pod that
-already holds the state. This is the conceptual anchor of module 8 and the honest answer
+already holds the state. This is the conceptual anchor of module 8 and the direct answer
 to "why is this not just LTM": because no packet-header control plane can see cache state.
 
-## Honest scoping (standing rule)
+## Scoping discipline (standing rule)
 
 Features that are Early Access (semantic AI caching) or outside the demo-mode shape
 (DPU/SR-IOV hardware paths, GRPCRoute on the two-node cluster) are taught as demo/slides

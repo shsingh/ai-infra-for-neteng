@@ -1,7 +1,9 @@
 # Case Study — Meridian University Research Computing
 
-All lab steps are framed as work orders for a fictional but realistic employer. This gives
-every module a purpose and gives the facilitator natural narrative beats between modules.
+Every module is taught as a work order issued by a fictional but realistic employer,
+Meridian University. The scenario gives each configuration change a technical and
+organisational justification and links the thirteen modules into one continuous
+engagement, from platform arrival to a governed shared model service.
 
 ## The organisation
 
@@ -10,11 +12,11 @@ university's general IT estate. On the same campus fabric sit very different ten
 populations, each with different security posture, compliance obligations, and blast-radius
 expectations:
 
-| Tenant class | Who they are | What they need |
+| Tenant class | Description | Requirements |
 |---|---|---|
-| Teaching and administration | Student record system, LMS, campus Wi-Fi | Predictable, isolated, boring |
+| Teaching and administration | Student record system, LMS, campus Wi-Fi | Predictability, isolation, stability |
 | Academic research | Genomics, climate modelling, humanities lab | Disciplined multi-tenancy |
-| AI research (natural-language and vision labs) | The GPU-hungry flagship | Performance at the VIP |
+| AI research (natural-language and vision labs) | The GPU-intensive flagship pool | Performance at the VIP |
 | Industry partners and collaborating institutions | Pay for compute time under data-sharing agreements | Metering, quotas, enforceable boundaries |
 
 The isolation requirement is real, not decorative: a compromised undergraduate workload
@@ -32,25 +34,23 @@ The AI platform lands on their desk with a clear brief: make ingress to the new 
 cluster work like everything else — routed, firewalled, VRF-isolated per tenant class —
 and let the platform team self-serve without raising tickets for every new service.
 
-## The work orders (the narrative arc)
+## Module work orders
 
-| Module | Work order the class works |
-|---|---|
-| m01 | The platform team's summary — "it's just Kubernetes" — hands the problem over; the class gets fluent in the object model and locate every piece on the three planes. |
-| m02 | The CIO asks why AI specifically needs Kubernetes. Ground the answer in GPU scheduling and inference traffic patterns; explain why the HPC clusters stayed on their existing scheduler. |
-| m03 | The GPU cluster is purchased; the software load balancer must be installed. Choose host vs DPU placement; install demo mode first, tour real-mode options. |
-| m04 | The AI cluster must join the fabric: peer with the campus spine over BGP, isolate tenants with VRF over VXLAN — exactly the way the university separates teaching, research, and industry tenants today. |
-| m05 | VRF deep dive: per-tenant routing plus per-tenant ACL enforcement, plus an honest footnote on the MPLS provider-edge status. |
-| m06 | The platform team wants self-service ingress without tickets. Enter Gateway API — the "Kubernetes VIP" story, told as one request crossing all three planes. |
-| m07 | Classic LB requirements resurface: TCP/UDP services for the genomics cluster, egress identity for tenant SNAT, ACLs between research divisions — all declarative now. |
-| m08 | The flagship: 3 replicas of a vLLM-protocol model pool. Naive round-robin wrecks cache economics; install InferencePool + the endpoint picker and watch cache-aware routing work. |
-| m09 | Incident review: telemetry, logs, the who-did-what trail — the questions asked during a night incident and after it by the ethics board. |
-| m10 (optional) | The operations team wants a GUI for day-1/day-2 operations — and a discussion of what a management-plane surface should and should not hide. |
-| m11 (optional) | The CIO's blunt question: can we just run OSS and skip the purchase order? An honest capability walk. |
-| m12 (optional) | The security office asks who reads hostile prompts before the model does. A prompt-safety decision engine wired behind the edge. |
-| m13 (optional) | The business office asks who meters the shared flagship pool, who protects it, and what happens when one tenant hammers it. The full shared-model control stack. |
+- **m01 — Kubernetes for Network Engineers.** The platform team hands the AI platform over with "it's just Kubernetes." Attendees build fluency in the object model, inventory the running components, and locate every piece on the three planes. Deliverable: a diagnosed Service selector fault.
+- **m02 — Why AI Runs on Kubernetes.** The CIO asks why the AI platform introduces Kubernetes when the estate already runs VMs behind BIG-IP. The module answers from GPU scheduling and inference traffic patterns, and establishes why packet-header load balancing cannot see cache state.
+- **m03 — Installing the Platform.** The GPU cluster is approved; BNK 2.4 must be installed. Attendees install demo mode on the two-node lab cluster and compare host and DPU placement for production, including the OpenShift (Host) requirement and what demo mode omits.
+- **m04 — BGP, VRF, EVPN.** The AI cluster must join the campus routing fabric like any other site: eBGP peering with the spine, tenant VRF over VXLAN, and advertisement of the future VIP — the same discipline the university uses to separate teaching, research, and industry tenants today, expressed as CRs.
+- **m05 — Per-Tenant Isolation.** Tenant classes are policy, not just routing tables: per-tenant dynamic routing (VRF, GA in 2.4) plus per-tenant ACL enforcement, with the MPLS provider-edge capability (Early Access) scoped and explicitly excluded from the hands-on.
+- **m06 — Gateway API: from VIP to Route.** Platform teams request self-service ingress without network-team tickets. Gateway API provides it: VIP allocation via FIC, one request traced across all three planes, and an iRule attached through the declarative path. Includes the wrong-namespace fault.
+- **m07 — Traditional Load Balancing.** Classic requirements return on the same platform: TCP/UDP services for the genomics cluster, per-tenant egress identity (EgressGateway), and ACLs between research divisions — all declared as CRs, all verified in the data plane and the log stream.
+- **m08 — AI Inference Routing.** Three vLLM-protocol replicas behind naive round-robin show poor time-to-first-token and near-zero cache hit rates. Attendees install InferencePool + the F5 endpoint picker and verify cache-aware steering with tmctl, including a fail-close configuration.
+- **m09 — Observability and Consolidated Review.** The platform is live; the module consolidates operations: CR status, TMM telemetry, tmctl as the show-tech, a scored multi-fault break-fix drill, and a from-memory review of the concept mappings.
+- **m10 (optional) — Management GUI.** Day-2 operations request a management surface: dashboards, audit trail, fleet view. bnk-forge is bound to the lab cluster and assessed for what a GUI may and may not replace on the management plane.
+- **m11 (optional) — OSS Capability Assessment.** The CIO asks whether the platform can run on open-source software alone. Attendees walk the capability table from both sides and identify where a commercial platform is — and is not — a requirement.
+- **m12 (optional) — Prompt Screening at the Edge.** The security office requires screening of arbitrary campus prompts before the model is reached: an open-weights decision model hosted by the rule engine, wired behind the edge, verified against a seed jailbreak corpus.
+- **m13 (optional) — Protecting and Metering the Shared Model.** The flagship pool operates as a paid shared service for three tenant classes: edge identity, per-tenant isolation, token metering with per-policy budgets, DoS shielding, and the audit chain — all on the Module 8 architecture.
 
-## Why the flagship becomes a shared, paid service (m13's motivation)
+## Why the flagship pool is shared and metered (m13 motivation)
 
 The flagship model pool serves all tenant classes as a paid shared service: token
 consumption is the billable unit, one tenant's bulk job can starve others, prompts from

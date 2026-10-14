@@ -67,16 +67,16 @@ graph TB
   TMM <-->|"eBGP · Multus net1"| SPINE
 ```
 
-Full environment diagrams (three planes, module arc, offline flow, build stages):
+Full environment diagrams (three planes, module sequence, offline flow, build stages):
 [docs/lab-environment.md](docs/lab-environment.md).
 
 ## The modules
 
 Ten core modules (Kubernetes for network engineers → install → BGP/VRF/EVPN routing →
 Gateway API → traditional LB → AI inference routing with the endpoint picker →
-observability) plus four optional extensions (a management GUI, an honest OSS-vs-buy
-walk, prompt screening at the edge, shared-model metering and protection). The narrative
-thread and per-module scripts: [docs/course/case-study.md](docs/course/case-study.md).
+observability) plus four optional extensions (a management GUI, an OSS-vs-commercial
+capability assessment, prompt screening at the edge, shared-model metering and
+protection). The scenario and per-module scripts: [docs/course/case-study.md](docs/course/case-study.md).
 
 ## Status
 
