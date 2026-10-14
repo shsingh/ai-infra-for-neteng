@@ -11,9 +11,6 @@ import time
 classname = "AI Infrastructure for Network Engineers"
 github_repo = "https://github.com/shsingh/ai-infra-for-neteng"
 
-sys.path.insert(0, os.path.abspath("."))
-import f5_sphinx_theme
-
 smartquotes = False
 year = time.strftime("%Y")
 
@@ -46,7 +43,6 @@ exclude_patterns = ["_build", "README.md", "pipeline.md", "requirements.txt", ".
 pygments_style = "sphinx"
 
 # AppWorld-style substitution prolog
-# AppWorld-style substitution prolog
 rst_prolog = """
 .. |classname| replace:: %(cls)s
 .. |classbold| replace:: **%(cls)s**
@@ -62,8 +58,8 @@ extlinks = {
 
 # -- Options for HTML output -------------------------------------------------
 
-html_theme = "f5_sphinx_theme"
-html_theme_path = f5_sphinx_theme.get_html_theme_path()
+html_theme = "f5-neteng-theme"
+html_theme_path = [os.path.abspath("_themes")]
 html_sidebars = {"**": ["searchbox.html", "localtoc.html", "globaltoc.html"]}
 html_theme_options = {
     "site_name": "AI Infrastructure for Network Engineers - Lab Guides",
