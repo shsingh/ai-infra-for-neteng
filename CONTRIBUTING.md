@@ -18,9 +18,9 @@ proposed, reviewed, and merged, and what the CI gates enforce.
      (`readme`, `facilitator`, `plan`).
    - Subject: imperative, lowercase, no trailing period. Body (optional): what changed
      and why; wrap at 72 columns.
-3. **Sign your commits.** Commits must be GPG-signed or SSH-signed. Unsigned commits are
+3. **Sign commits.** Commits must be GPG-signed or SSH-signed. Unsigned commits are
    not merged. Verify locally with `git log --show-signature`.
-4. **Never merge your own pull request.** Build agents open PRs with green CI; the
+4. **Never merge a pull request authored by the same contributor.** Build agents open PRs with green CI; the
    repository owner reviews and merges.
 5. **Secrets never enter the repo.** Credential material (image-pull secret tarball,
    license JWT) lives in the gitignored `keys/` directory. The gitleaks hook and the
@@ -63,5 +63,4 @@ pre-commit run --all-files
 
 ## Licensing
 
-By contributing you agree your contributions are licensed under the repository's
-LICENSE (MIT).
+Contributions are licensed under the repository's LICENSE (MIT) upon acceptance.

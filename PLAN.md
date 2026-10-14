@@ -69,7 +69,7 @@ host, so worker reservations must fit the Docker daemon's allocation — hence t
 
 | Module | Build outputs | Lab guide |
 |---|---|---|
-| M1 Kubernetes for network engineers | README quickstart, devShell, `m1-orient` app, fault `m1-endpoints` | labs/lab01-kubernetes.md |
+| M1 Kubernetes for network engineers | README quickstart, devShell, `m1-orient` app, fault exercise `m1-endpoints` | labs/lab01-kubernetes.md |
 | M2 Why AI runs on Kubernetes (concept) | Class intro + lab01 preamble | (class intro) |
 | M3 Install BNK (host vs DPU; demo mode) | bootstrap/deploy apps, kindbnkctl 2.4.0 override, doctor | labs/lab02-install-bnk.md |
 | M4 BGP, VRF, EVPN (OcNOS path) | `manifests/bgp/*`, `fabric/frr.conf`, m4 apps, faults `m4-bgp-secret`, `m4-vxlan-vni` | labs/lab03-routing-bgp.md |
@@ -85,9 +85,9 @@ host, so worker reservations must fit the Docker daemon's allocation — hence t
 
 Hard rules from the course: M8 is never cut entirely; M4/M5 absorb overruns; optional
 modules (m10–m13) are the first cuts when a cohort runs long — each optional module is
-also self-contained enough to run as a take-home exercise. The contingency decision is
-the facilitator's call in the room, guided by the module narrative beats (which parts of
-a module are demonstrable without the hands-on portion) rather than by a stopwatch.
+also self-contained enough to run as a take-home exercise. Pacing decisions rest with the
+facilitator, guided by the module narrative beats (which parts of a module are
+demonstrable without the hands-on portion) rather than by a stopwatch.
 
 ## 4. Repository layout
 
@@ -339,7 +339,7 @@ HSL rows are the billing feed; recommended rollout is log_only first, then flip 
 `show bgp neighbor` / `show bgp ipv4 unicast` via the m4-bgp-verify app. Demo-mode caveat
 printed by the app: on real hardware the peer is the actual spine/leaf.
 
-### 6.4 Fault injection (8 faults; apply → taught diagnosis → exact-inverse restore)
+### 6.4 Fault exercises (8 faults; attendee-run apply → taught diagnosis → exact-inverse restore)
 
 | Fault ID | Module | Symptom taught |
 |---|---|---|
@@ -353,8 +353,9 @@ printed by the app: on real hardware the peer is the actual spine/leaf.
 | m8-pool-ports | M8 | targetPorts ≠ sim containerPort; 5xx through the pool |
 
 Design rules: faults never touch the kind control plane; apply prints the symptom first;
-every fault runs solo by students at home; `reset -- <module>` returns pristine state
-(delete + reapply; routing CRDs delete-and-recreate).
+each fault is fully attendee-executed — apply, diagnosis, and restore all run on the
+attendee's own instance without assistance of any kind; `reset -- <module>` returns pristine
+state (delete + reapply; routing CRDs delete-and-recreate).
 
 ## 7. Lab guides (AppWorld format)
 
@@ -370,7 +371,7 @@ The guide template (from the F5 AppWorld 2026 AI labs repo [18]) — one guide p
 3. **Expected outcome** line closing each task.
 4. **Validation** section (concrete, checkable state) at the end of the lab.
 5. **Troubleshooting**: symptom → check pairs, drawn from real build failures.
-6. **Clean-Up** (optional), then **What You Learned** bullets.
+6. **Clean-Up** (optional), then a **What Was Learned** bullet summary.
 7. The course's own addition: a **Planes check** line at the end of every lab (which
    management/control/data-plane surfaces the lab just touched).
 
@@ -407,8 +408,10 @@ properties make this work:
    self-paced remote attendee over SSH and for an in-room attendee with browser + console
    access.
 
-The facilitator runs no environment for attendees: their own seat is only for
-demonstration, break-fix injection, and the post-class report.
+The facilitator has no access to attendee instances and runs none for them: their own
+seat is for demonstrating steps on the shared screen and for the post-class report. Every
+exercise — including fault drills — is self-contained on each attendee VM and is driven
+entirely by the attendee through the documented Nix apps.
 
 ### 8.2 Bootstrap
 
@@ -419,7 +422,7 @@ git clone https://github.com/shsingh/ai-infra-for-neteng.git
 cd ai-infra-for-neteng
 nix run .#bootstrap      # 10-20 min first run; streams progress
 nix develop              # pinned shell; KUBECONFIG set
-nix run .#doctor         # green board = your lab is ready
+nix run .#doctor         # green board = the lab is ready
 ```
 
 Web-access attendees do the same inside the browser terminal (or via their platform's
@@ -470,7 +473,7 @@ The lab runs without internet, once the bundle exists. Two pinned apps close the
 
 With the bundle present, the complete lab — environment, locally rendered docs
 (`nix run .#docs` resolves from the same closure), and the lab guides — builds and runs on
-an isolated VM. First-time host prep (Docker + Nix install, [§8.1](#81-one-time-host-prep-the-only-manual-steps)) still needs one online
+an isolated VM. First-time host prep (Docker + Nix install, [§8.1](#81-the-attendee-instance-model)) still needs one online
 session or a preinstalled estate image; every subsequent cohort run is fully offline. The
 producer is re-run only on version bumps (between cohorts); its output hash is recorded in
 FACILITATOR.md.
@@ -480,7 +483,7 @@ FACILITATOR.md.
 ```text
 nix run .#doctor                 # environment check (incl. GAIE CRDs)
 nix run .#m1-orient              # nodes/pods overview; extract BNK pod names
-nix run .#break-fix -- m1-endpoints apply|restore
+nix run .#break-fix -- m1-endpoints apply|restore   # run by each attendee on their instance
 nix run .#m3-status              # bnkgatewayclass, CRD inventory (incl. F5EPP/GatewaySettings)
 nix run .#m3-tmm-console         # guided kubectl exec into f5-tmm
 nix run .#m4-bgp-template|global|verify
@@ -546,10 +549,11 @@ Every attendee owns a dedicated instance (no sharing by default — a pair-share
 is fine on constrained deliveries): identical image, identical repository flow, so
 attendee seats are interchangeable. Any instance that falls behind re-runs bootstrap
 before Module 1 — its owner, not the facilitator, does it. The facilitator's own instance
-is the control seat for the room: showing steps on the shared screen, injecting
-[break-fix faults](#64-fault-injection-8-faults-apply--taught-diagnosis--exact-inverse-restore)
-into **their own** environment (never touching an attendee's instance), and producing the
-post-class report.
+exists purely to demonstrate steps on the shared screen and to produce the post-class
+report; the facilitator has no access to attendee instances and never interacts with them.
+Fault exercises run entirely on the attendee's instance via
+[`nix run .#break-fix`](#64-fault-exercises-8-faults-attendee-run-apply--taught-diagnosis--exact-inverse-restore)
+and need no facilitator action.
 
 ## 9. Build order (stages and exit gates)
 

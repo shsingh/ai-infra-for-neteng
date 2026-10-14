@@ -8,8 +8,8 @@ LTM (virtual servers, pools, monitors, SNAT/automap, iRules, profiles, HA, tmsh)
 operate declarative estates already (ACI/FMC policy models, Junos Evolved, config-as-code
 pipelines) and most have touched public cloud (AWS ALB/NLB, Azure LB, tenants/subscriptions).
 
-They think in devices, interfaces, VLANs, route tables, and control/data planes. The course
-keeps that habit and re-points it — it does not replace it.
+Attendees think in devices, interfaces, VLANs, route tables, and control/data planes. The
+course keeps that habit and re-points it rather than replacing it.
 
 ## The three planes (the course's spine)
 
@@ -38,7 +38,7 @@ memory — that recall is the graduation test.
 | iRule | iRules still exist: the Irule CR + NetPolicy attachment | Supported events/commands are a subset |
 | SNAT pool / egress | EgressGateway CR | Same mental model; now a Gateway-API-shaped object |
 | ACL/Firewall | FwPolicy/FwRulelist attached via SecPolicy | The policy-attachment pattern |
-| Route reflector / fabric | You keep your fabric; peering via BGP CRDs | Kubernetes does not replace your fabric |
+| Route reflector / fabric | The campus fabric stays in place; peering is configured via BGP CRDs | Kubernetes does not replace the fabric |
 | Console/LED status | kubectl get, CR status fields, pod logs | "Show commands" become kubectl get/describe/logs |
 
 ## The analogy grid (second handout — use whichever column lands)
@@ -56,10 +56,10 @@ files in Git and lets a controller do the merge. Same muscle memory, stronger ra
 
 ## The six traps that sink this audience (teach explicitly)
 
-1. No per-device config. You never log into the forwarding pod to configure; you write
-   CRs and controllers push. Debugging = reading CR status and pod logs.
-2. Desired state vs imperative. Editing a CR works but gets replaced by the next apply;
-   config lives in Git (GitOps is the norm).
+1. No per-device configuration. No one logs into the forwarding pod to configure it; the
+   declarative path is writing CRs, which controllers reconcile. Debugging = reading CR status and pod logs.
+2. Desired state versus imperative. Direct CR edits work but are replaced by the next
+   apply; the configuration lives in Git — GitOps is the norm.
 3. CNI is not the data plane. Calico gives pods L3; the F5 forwarding engine is a
    separate, hardware-grade plane attached via VLANs/SR-IOV (virtio in demo mode). Two
    routing stacks coexist — knowing which one carries what is a core skill.
@@ -74,8 +74,8 @@ files in Git and lets a controller do the merge. Same muscle memory, stronger ra
 ## Teaching method
 
 - Layer-cake framing in every module: Kubernetes runs containers and programs the network
-  through controllers; the F5 plane is the forwarding "box"; CRDs are the config language;
-  your fabric is unchanged.
+  through controllers; the F5 plane is the forwarding "box"; CRDs are the configuration
+  language; the campus fabric is unchanged.
 - Every module: a short concept talk with the relevant mapping-slice → guided hands-on
   typed by the student (never pasted blindly) → verification checkpoint → one break-fix
   drill → one narrative beat advancing the case study.

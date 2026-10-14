@@ -36,7 +36,7 @@ and let the platform team self-serve without raising tickets for every new servi
 
 | Module | Work order the class works |
 |---|---|
-| m01 | "It's just Kubernetes, you'll figure it out" — get fluent in the object model and locate every piece on the three planes. |
+| m01 | The platform team's summary — "it's just Kubernetes" — hands the problem over; the class gets fluent in the object model and locate every piece on the three planes. |
 | m02 | The CIO asks why AI specifically needs Kubernetes. Ground the answer in GPU scheduling and inference traffic patterns; explain why the HPC clusters stayed on their existing scheduler. |
 | m03 | The GPU cluster is purchased; the software load balancer must be installed. Choose host vs DPU placement; install demo mode first, tour real-mode options. |
 | m04 | The AI cluster must join the fabric: peer with the campus spine over BGP, isolate tenants with VRF over VXLAN — exactly the way the university separates teaching, research, and industry tenants today. |
