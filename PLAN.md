@@ -8,7 +8,7 @@ engineers, taught through a three-planes narrative (management, control, data) a
 university case study. Everything in the course is declarative: custom resources in Git,
 applied by students by hand, verified through status conditions and TMM `tmctl` tables. This
 plan specifies the repository that makes the lab real and self-bootstrapping. The published
-F5 documentation (References, §11) is the source of truth for every product behavior,
+F5 documentation ([References](#13-references)) is the source of truth for every product behavior,
 manifest field, and verification command quoted here; where this plan and the F5 docs
 disagree, the F5 docs win and this plan must be corrected.
 
@@ -18,9 +18,9 @@ disagree, the F5 docs win and this plan must be corrected.
 
 | # | Deliverable | Verified by |
 |---|---|---|
-| 1 | Self-bootstrapping lab repo (Nix flake, apps, manifests, fabric, faults) | Acceptance gates, §10 |
-| 2 | Lab guides per module (AppWorld task-based format) rendered to GitHub Pages | Guide contract, §7 |
-| 3 | Operating contract: bootstrap / sync / reset / teardown for course delivery | §8 |
+| 1 | Self-bootstrapping lab repo (Nix flake, apps, manifests, fabric, faults) | [Acceptance gates](#10-acceptance-gates) |
+| 2 | Lab guides per module (AppWorld task-based format) rendered to GitHub Pages | [Guide contract](#7-lab-guides-appworld-format) |
+| 3 | Operating contract: bootstrap / sync / reset / teardown for course delivery | [Environment contract](#8-environment-contract-init-sync-reset) |
 
 Rules for any agent executing this plan:
 
@@ -154,7 +154,7 @@ ai-infra-for-neteng/
 ### 4.1 flake contract
 
 - Inputs: nixpkgs (pinned rev in flake.lock) and flake-utils.
-- `apps`: every command in §8 plus `airgap-bundle` (offline bundle producer, §8.2.1); each app obeys the four-part contract (announce → run →
+- `apps`: every command in [§8](#8-environment-contract-init-sync-reset) plus `airgap-bundle` ([offline bundle producer](#821-offline-bootstrap-self-sustained-vm)); each app obeys the four-part contract (announce → run →
   verify → print expected output) and is idempotent. All CR waits go through
   `course-libs.wait-for-status` (status polling + timeout + human-readable failure).
 - `devShells.default`: pinned kind, kubectl, helm, jq, yq, git; sets `KUBECONFIG`; shell
@@ -174,8 +174,8 @@ mode, resume-safe, symmetric destroy). It is pinned by hash, never hand-installe
 properties the lab relies on: `kindbnkctl init demo` creates a PoC workspace with
 `poc.yaml` as declarative state; `keys/` holds the customer-supplied FAR tarball + JWT;
 phases: cluster up → deploy prereqs → deploy flo → deploy cne; minimum host floor enforced
-by `kindbnkctl doctor` (see §2 sizing). The BNK version moves via the release-manifest
-override (§5), not via re-pin of the binary.
+by `kindbnkctl doctor` (see [the lab architecture sizing](#2-lab-architecture)). The BNK version moves via the release-manifest
+override ([§5](#5-version-pins)), not via re-pin of the binary.
 
 ## 5. Version pins
 
@@ -238,7 +238,7 @@ CI re-checks YAML parse and client-side dry-run on every PR.
 | 11-nova-deployment.yaml | Nova + Laya (CPU-class); verdict logging; images pinned (tag + digest) at build | [17],[20] |
 | 12-nova-rules.yaml | Seed prompt rules — block/flag/pass tiers per tenant class | [20] |
 | 13-httproute-ai-sec.yaml | HTTPRoute: Nova as first backendRef for /v1/*, InferencePool second; TMM enforces 403 on block | [20] |
-| 14-token-governance-gateway.yaml | Gateway annotations: full `k8s.f5.com/ai-token-counting` block (§6.2); HSL pool name | [13] |
+| 14-token-governance-gateway.yaml | Gateway annotations: full `k8s.f5.com/ai-token-counting` block ([§6.2](#62-token-counting-annotation-m13-anchor)); HSL pool name | [13] |
 | 15-m13-tenant-fw.yaml | Per-tenant firewall matrix + log/HSL profiles | [2],[13] |
 
 ### 6.1 The M8 three-CR path (course anchor)
@@ -414,7 +414,7 @@ Bootstrap order (each step checks-then-acts, idempotent, resume-safe):
    installs Nix itself.
 3. Keys check: FAR tarball and JWT present in `keys/`; else human message → FACILITATOR.md.
 4. Image pre-pull: BNK release-manifest images, llm-d-inference-sim, FRR spine, nginx,
-   curl. With `--offline`, loads from the airgap bundle instead (§8.2.1) and skips the
+   curl. With `--offline`, loads from the [airgap bundle](#821-offline-bootstrap-self-sustained-vm) instead and skips the
    network entirely.
 5. Cluster up + BNK deploy: kindbnkctl e2e with the **2.4.0 release-manifest override**;
    the long step; streams pod status; exits when TMM pods Ready and CNEInstance Available.
@@ -447,7 +447,7 @@ The lab runs without internet, once the bundle exists. Two pinned apps close the
 
 With the bundle present, the complete lab — environment, locally rendered docs
 (`nix run .#docs` resolves from the same closure), and the lab guides — builds and runs on
-an isolated VM. First-time host prep (Docker + Nix install, §8.1) still needs one online
+an isolated VM. First-time host prep (Docker + Nix install, [§8.1](#81-one-time-host-prep-the-only-manual-steps)) still needs one online
 session or a preinstalled estate image; every subsequent cohort run is fully offline. The
 producer is re-run only on version bumps (between cohorts); its output hash is recorded in
 FACILITATOR.md.
@@ -538,8 +538,8 @@ does not proceed past a red gate.
 | 6 (~2 h) | M8 three-CR path; blast before/after; tmctl capture | cascade all True; success == calls; convergence visible |
 | 7 (~3 h) | M9–M13 telemetry/set/optimizer pages | each optional module reproduces its verification |
 | 8 (~1 h) | All 8 faults: apply/diagnose/restore; reset apps; timing | fault table green; resets pristine |
-| 9 (~3 h) | Lab guides to §7 contract + mkdocs/Pages pipeline | a cold reader following lab02 + lab08 reproducates the captured outputs |
-| 10 (~1 h) | Acceptance: teardown → two consecutive clean-clone bootstraps green; airgap-mode check; final PR | gates §10 all pass; PR open |
+| 9 (~3 h) | Lab guides to the [guide contract](#7-lab-guides-appworld-format) + mkdocs/Pages pipeline | a cold reader following lab02 + lab08 reproducates the captured outputs |
+| 10 (~1 h) | Acceptance: teardown → two consecutive clean-clone bootstraps green; airgap-mode check; final PR | all [acceptance gates](#10-acceptance-gates) pass; PR open |
 
 Known-failure signature to recognize in Stage 2 (not a product error): pods Pending with
 `FailedScheduling: Insufficient memory` on the worker ⇒ the VM is under the reservation
