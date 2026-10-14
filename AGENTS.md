@@ -40,14 +40,17 @@ Build, in order, and verify against a running environment:
 
 1. **The lab environment automation** — a Nix flake with pinned tools (kind, kubectl, helm,
    jq, yq, kindbnkctl), one app per course step (`apps/`), validated YAML manifests in
-   course order (`manifests/`), an FRR fabric-peer container (`fabric/`), fault injection
+   course order (`manifests/`), an FRR fabric-peer container (`fabric/`), the attendee-run fault exercises
    (`nix run .#break-fix`), and a bootstrap app that takes a bare VM to a green doctor board.
 2. **The lab guides** — one guide per module under `docs/labs/`, in the task-based format
    defined in [PLAN — Lab guides](PLAN.md#7-lab-guides-appworld-format), rendered by Sphinx (f5_sphinx_theme — the AppWorld/clouddocs look) to GitHub Pages
    via GitHub Actions and locally on the lab VM (`nix run .#docs`, offline-capable).
 3. **The operating contract** — bootstrap / sync / reset / teardown commands as specified in
-   [PLAN — Environment contract](PLAN.md#8-environment-contract-init-sync-reset), plus `README.md` (student quickstart) and `FACILITATOR.md` (T-minus checklist,
-   version ledger, credentials how-to).
+   [PLAN — Environment contract](PLAN.md#8-environment-contract-init-sync-reset), plus `README.md` (student quickstart) and `FACILITATOR.md` (run order, version
+   ledger, credentials how-to). The facilitator has no access to attendee instances and
+   runs none for them: every exercise, including fault drills, is self-contained on each
+   attendee VM and driven through the documented Nix apps; nothing in the tooling may
+   assume a facilitator or peer machine touches an attendee environment.
 
 ## Non-negotiable rules
 
@@ -60,7 +63,7 @@ Build, in order, and verify against a running environment:
 3. **Expected outputs are captured, never invented.** Every expected output quoted in a lab
    guide comes from an actual captured run stored under `docs/expected/`. Guides are frozen
    only after their commands have executed against the running cluster.
-4. **Branch protection: never merge your own pull request.** Work happens on feature
+4. **Branch protection: never merge a pull request authored by the same contributor.** Work happens on feature
    branches; open PRs for review; the repository owner merges. CI (`nix flake check`,
    manifest validation, docs build) must be green before a PR is opened.
 5. **Stop conditions.** If the pinned deployer cannot be made to deliver BNK 2.4.0 (see the
@@ -113,7 +116,7 @@ and [PLAN — Manifest specifications](PLAN.md#6-manifest-specifications).
 | `nix run .#doctor` | environment green board; the arbiter of "ready to teach" |
 | `nix develop` | pinned student shell (KUBECONFIG, kind/kubectl/helm/jq/yq) |
 | `nix run .#sync` | repo-to-cluster sync: dry-run, apply changed manifests, drift report |
-| `nix run .#break-fix -- <id> apply\|restore` | inject/restore a taught fault (8 faults, [PLAN — Fault injection](PLAN.md#64-fault-injection-8-faults-apply--taught-diagnosis--exact-inverse-restore)) |
+| `nix run .#break-fix -- <id> apply\|restore` | attendee-run fault exercise (8 faults, [PLAN — Fault exercises](PLAN.md#64-fault-exercises-8-faults-attendee-run-apply--taught-diagnosis--exact-inverse-restore)) |
 | `nix run .#reset -- <module>` | return a module to pristine state |
 | `nix run .#teardown` | symmetric destroy |
 

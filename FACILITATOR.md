@@ -6,16 +6,16 @@ content lives in `docs/labs/` (rendered site); the content system of record live
 is [`AGENTS.md`](AGENTS.md). This file is the operational twin: run order, credentials,
 drills, and the version ledger.
 
-## What you run, in order (first time)
+## Facilitator run order (first time)
 
-1. Build/verify the **course image**: linux/amd64, Ubuntu 24.04 or your RHEL-family estate
+1. Build/verify the **course image**: linux/amd64, Ubuntu 24.04 or the RHEL-family estate
    image ([sizing rationale](PLAN.md#2-lab-architecture)) with Docker Engine and Nix
-   preinstalled ([PLAN §8.1](PLAN.md#81-one-time-host-prep-the-only-manual-steps) — the
+   preinstalled ([PLAN §8.1](PLAN.md#81-the-attendee-instance-model) — the
    only two baked-in installs; Nix via the Determinate Systems installer, multi-user,
-   flakes enabled). Every attendee instance boots **from this image**, and attendees
-   bootstrap their own lab on it at course start — you never start an environment for
-   them.
-2. Smoke-test the image yourself: boot one instance from it and run the full
+   flakes enabled). Every attendee instance boots **from this image**, and each attendee
+   bootstraps their own lab on it at course start. The facilitator neither starts nor
+   accesses attendee environments.
+2. Smoke-test the image: boot one instance from it and run the full
    [bootstrap flow](PLAN.md#82-bootstrap) end to end; record results in the version
    ledger.
 3. Obtain the two credential files through F5 channels:
@@ -43,10 +43,11 @@ drills, and the version ledger.
 - During: students keep their own pace via the guides; apps handle waits, verification,
   traffic, and faults — students hand-apply every manifest. Guides carry the expected
   outcomes (captured outputs in `docs/expected/`; never invent an expected output).
-- Break-fix drills: `nix run .#break-fix -- <id> apply|restore` — the fault table with
-  taught diagnosis paths is in [PLAN §6.4](PLAN.md#64-fault-injection-8-faults-apply--taught-diagnosis--exact-inverse-restore).
+- Fault drills are attendee-executed end to end: `nix run .#break-fix -- <id> apply|restore`
+  with the fault table in [PLAN §6.4](PLAN.md#64-fault-exercises-8-faults-attendee-run-apply--taught-diagnosis--exact-inverse-restore).
   Every fault has an exact-inverse restore; `nix run .#reset -- <module>` returns a
-  module to pristine.
+  module to pristine. The facilitator's role is advisory only: they never inject, apply,
+  or restore anything inside an attendee instance.
 - Between cohorts: attendee instances are disposed and re-created fresh per seat; on a
   persistent seat, `nix run .#teardown` then `nix run .#bootstrap`, or keep the cluster
   warm and use `nix run .#reset -- <module>`.
@@ -61,8 +62,8 @@ nix run .#airgap-bundle -- --out /path/to/bundle
 ```
 
 then on the isolated VM: `nix run .#bootstrap -- --offline --bundle /path/to/bundle`.
-The bundle carries every container image, the release-manifest charts (built here — your
-credentials are used only while producing the bundle, on your host), and the Nix
+The bundle carries every container image, the release-manifest charts (produced on the connected host — the
+F5 credentials are used only while producing the bundle there), and the Nix
 closures; the VM needs no outbound network after that.
 
 ## Version ledger
@@ -103,8 +104,8 @@ guides render from it.
 
 - No DPU hardware: the DPU segment is a recorded demo with captured output.
 - No Early Access hands-on: semantic caching stays a demo + discussion (labeled in the
-  guides); anything requiring EA licensing is out of scope unless you arrange it.
+  guides); anything requiring EA licensing is out of scope unless the course owner arranges it.
 - No OpenShift cluster in class: the production-target delta is covered by a recorded
   walkthrough (`nix run .#ocp-demo`) and notes in the closing guide.
 - No MPLS provider-edge lab: Early Access path from the previous release; not announced
-  in the 2.4 release notes; verify with your F5 account team.
+  in the 2.4 release notes; verify with the F5 account team.
