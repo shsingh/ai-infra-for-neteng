@@ -21,7 +21,9 @@ nix run .#doctor
 
 stands up the complete lab environment — no other tooling installed by hand except Docker
 and Nix itself. The repository also renders the student lab guides (AppWorld-style,
-task-based) to GitHub Pages.
+task-based) to GitHub Pages, and an offline bundle mode (`airgap-bundle`) makes the VM
+fully self-sustained: environment, guides, and locally rendered docs run with no internet
+connection.
 
 The course teaches: Kubernetes for network engineers, BNK (BIG-IP Next for Kubernetes) 2.4
 installation in demo mode, BGP/VRF/EVPN routing via CRDs, Gateway API ingress, traditional

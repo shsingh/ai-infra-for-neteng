@@ -104,6 +104,7 @@ ai-infra-for-neteng/
 │   └── course-libs.nix        # wait-for-status, blast-traffic, tally, hsl-tail
 ├── apps/
 │   ├── bootstrap.nix          # preflight, image pre-pull, deploy, GAIE CRDs, spine, doctor
+│   ├── airgap-bundle.nix      # offline-bundle producer: images + charts + nix closures
 │   ├── deploy.nix             # kindbnkctl e2e wrapper (resume-safe)
 │   ├── doctor.nix             # environment green board
 │   ├── sync.nix               # repo-to-cluster sync: validate + apply changed manifests
@@ -153,7 +154,7 @@ ai-infra-for-neteng/
 ### 4.1 flake contract
 
 - Inputs: nixpkgs (pinned rev in flake.lock) and flake-utils.
-- `apps`: every command in §8; each app obeys the four-part contract (announce → run →
+- `apps`: every command in §8 plus `airgap-bundle` (offline bundle producer, §8.2.1); each app obeys the four-part contract (announce → run →
   verify → print expected output) and is idempotent. All CR waits go through
   `course-libs.wait-for-status` (status polling + timeout + human-readable failure).
 - `devShells.default`: pinned kind, kubectl, helm, jq, yq, git; sets `KUBECONFIG`; shell
@@ -412,8 +413,9 @@ Bootstrap order (each step checks-then-acts, idempotent, resume-safe):
 2. Nix check: if Nix/flakes absent, print the exact installer command and stop — never
    installs Nix itself.
 3. Keys check: FAR tarball and JWT present in `keys/`; else human message → FACILITATOR.md.
-4. Image pre-pull (airgap insurance): BNK release-manifest images, llm-d-inference-sim,
-   FRR spine, nginx, curl. Offline mode loads a `labimages` tarball (nix copy closure).
+4. Image pre-pull: BNK release-manifest images, llm-d-inference-sim, FRR spine, nginx,
+   curl. With `--offline`, loads from the airgap bundle instead (§8.2.1) and skips the
+   network entirely.
 5. Cluster up + BNK deploy: kindbnkctl e2e with the **2.4.0 release-manifest override**;
    the long step; streams pod status; exits when TMM pods Ready and CNEInstance Available.
 6. GAIE CRDs applied from the hashed v1.4.0 source; verified registered.
@@ -421,9 +423,34 @@ Bootstrap order (each step checks-then-acts, idempotent, resume-safe):
 8. Smoke: `nix run .#doctor` full green board (nodes, TMM, CRDs incl. f5 + inference,
    spine reachable, VIP IPAM responding, eppNamespaces sane, end-to-end curl).
 
-Zero-clone variant: `nix run github:shsingh/ai-infra-for-neteng#bootstrap` — the
-app clones the repo itself before touching the cluster. The clone path stays the documented
-default.
+Zero-clone variant: `nix run github:shsingh/ai-infra-for-neteng#bootstrap` evaluates and
+runs the flake straight from the fetched source, no local checkout needed. The clone path
+stays the documented default: the course applies manifests by hand, which requires the
+checkout.
+
+### 8.2.1 Offline bootstrap (self-sustained VM)
+
+The lab runs without internet, once the bundle exists. Two pinned apps close the loop:
+
+- **Producer** (run once, on any internet-connected host):
+  `nix run .#airgap-bundle -- --out <dir>` writes:
+  - `labimages.tar` — every container image the lab pulls: the BNK release-manifest image
+    set, llm-d-inference-sim (pinned digest), the FRR spine, nginx, curl, and the kind
+    node image;
+  - the FLO/CNE release-manifest charts and manifests, downloaded from repo.f5.com using
+    the FAR credentials from `keys/`;
+  - the Nix closures for the flake itself (pinned tools, devShell, GAIE CRDs, spine
+    derivation, docs toolchain) via `nix copy --to file://<dir>/closure`.
+- **Consumer**: `nix run .#bootstrap -- --offline --bundle <dir>` imports the Nix closures
+  (`nix copy --from`), loads `labimages.tar` into Docker, injects the staged charts as the
+  release-manifest source, and runs the standard pipeline with no outbound network.
+
+With the bundle present, the complete lab — environment, locally rendered docs
+(`nix run .#docs` resolves from the same closure), and the lab guides — builds and runs on
+an isolated VM. First-time host prep (Docker + Nix install, §8.1) still needs one online
+session or a preinstalled estate image; every subsequent cohort run is fully offline. The
+producer is re-run only on version bumps (between cohorts); its output hash is recorded in
+FACILITATOR.md.
 
 ### 8.3 Per-module apps (course order)
 
