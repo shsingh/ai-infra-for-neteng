@@ -48,6 +48,7 @@ Offline/airgapped delivery is supported end to end:
 ## The lab in one picture
 
 ```mermaid
+%%{init: {"theme":"base","themeVariables":{"primaryColor":"transparent","primaryBorderColor":"#1d9cd3","lineColor":"#04395d","clusterBkg":"transparent","clusterBorder":"#04395d"}}}%%
 graph TB
   subgraph LAB["Attendee lab instance — one linux/amd64 VM (Docker + Nix), bootstrapped from this repo"]
     direction TB

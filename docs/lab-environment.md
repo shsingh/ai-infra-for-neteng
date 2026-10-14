@@ -7,6 +7,7 @@ outside the VM. See [PLAN.md](https://github.com/shsingh/ai-infra-for-neteng/blo
 ## Attendee instance and environment shape
 
 ```mermaid
+%%{init: {"theme":"base","themeVariables":{"primaryColor":"transparent","primaryBorderColor":"#1d9cd3","lineColor":"#04395d","clusterBkg":"transparent","clusterBorder":"#04395d","fontFamily":"-apple-system, Segoe UI, Roboto, sans-serif"},"flowchart":{"curve":"basis"}}}%%
 graph TB
   subgraph ATTENDEE["Attendee lab instance — fresh boot, one linux/amd64 VM (16c / 32 GB)"]
     direction TB
@@ -36,6 +37,7 @@ graph TB
 ## The three planes a request crosses (m06 preview)
 
 ```mermaid
+%%{init: {"theme":"base","themeVariables":{"primaryColor":"transparent","primaryBorderColor":"#1d9cd3","lineColor":"#04395d","clusterBkg":"transparent","clusterBorder":"#04395d","fontFamily":"-apple-system, Segoe UI, Roboto, sans-serif"},"flowchart":{"curve":"basis"}}}%%
 graph LR
   A["Management plane<br/>attendee applies CRs<br/>(Gateway / HTTPRoute / F5EPP)"] --> B["Control plane<br/>controllers compute desired vs observed<br/>FIC allocates VIP · CNE renders config ·<br/>OcNOS routes and advertises · EPP scores pods"]
   B --> C["Data plane<br/>TMM forwards: VIP, SNAT, firewall,<br/>per-request picker consult (ext_proc)"]
@@ -45,6 +47,7 @@ graph LR
 ## Module walk (the course arc)
 
 ```mermaid
+%%{init: {"theme":"base","themeVariables":{"primaryColor":"transparent","primaryBorderColor":"#1d9cd3","lineColor":"#04395d","clusterBkg":"transparent","clusterBorder":"#04395d","fontFamily":"-apple-system, Segoe UI, Roboto, sans-serif"},"flowchart":{"curve":"basis"}}}%%
 graph LR
   M1["m01<br/>Kubernetes<br/>= mgmt plane"] --> M3["m03<br/>install<br/>BNK 2.4 demo"]
   M3 --> M4["m04<br/>BGP / VRF /<br/>EVPN vs spine"]
@@ -63,6 +66,7 @@ graph LR
 ## Offline / restricted-room flow
 
 ```mermaid
+%%{init: {"theme":"base","themeVariables":{"primaryColor":"transparent","primaryBorderColor":"#1d9cd3","lineColor":"#04395d","clusterBkg":"transparent","clusterBorder":"#04395d","fontFamily":"-apple-system, Segoe UI, Roboto, sans-serif"},"flowchart":{"curve":"basis"}}}%%
 graph LR
   P["any connected host<br/>nix run .#airgap-bundle"] -->|"labimages.tar<br/>FLO/CNE charts<br/>nix closures"| B["bundle dir<br/>(hash recorded in FACILITATOR.md ledger)"]
   B --> C["attendee instance (no internet)<br/>nix run .#bootstrap -- --offline --bundle ..."]
@@ -72,6 +76,7 @@ graph LR
 ## Repository build stages (what the build agent verifies, in order)
 
 ```mermaid
+%%{init: {"theme":"base","themeVariables":{"primaryColor":"transparent","primaryBorderColor":"#1d9cd3","lineColor":"#04395d","clusterBkg":"transparent","clusterBorder":"#04395d","fontFamily":"-apple-system, Segoe UI, Roboto, sans-serif"},"flowchart":{"curve":"basis"}}}%%
 graph TB
   S1["stage 1<br/>flake skeleton + doctor"] --> S2["stage 2<br/>BNK 2.4.0 install path<br/>(stop-if-old-BNK gate)"]
   S2 --> S3["stage 3<br/>GAIE CRDs"]

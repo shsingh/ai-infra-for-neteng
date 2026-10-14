@@ -37,6 +37,15 @@
 
   {%- endblock %}
 
+  {# f5-neteng-theme: explicit theme CSS (depth-computed). Not via css_files: the basic
+       theme runs pathto() over those entries and breaks nested-page URLs. #}
+  {% set prefix = "../" * (pagename.count("/")) %}
+  <link rel="stylesheet" href="{{ prefix }}_static/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{{ prefix }}_static/css/f5.css">
+  <link rel="stylesheet" href="{{ prefix }}_static/css/f5-theme.css">
+  <link rel="stylesheet" href="{{ prefix }}_static/css/custom.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
   {# FAVICON #}
   <link href="https://cdn.f5.com/favicon.ico" rel="icon">
 
