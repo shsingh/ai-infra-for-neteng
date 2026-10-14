@@ -5,8 +5,12 @@ $(document).ready(function () {
   // they are loaded; otherwise the placeholders stay empty and the page is fully usable.
   var loc = window.location,
     host = loc.protocol + '//' + loc.host;
-  $('#clouddocs-header').load(host + '/header.html', function () { if (typeof Coveo !== 'undefined') { loadCoveoComponents(); } });
-  $('#clouddocs-footer').load(host + '/footer.html');
+  // header/footer placeholders stay as rendered by Sphinx: no remote host fetches,
+  // no versions.json round-trip — plain static hosting serves everything from _static
+  if (false) {
+    $('#clouddocs-header').load(host + '/header.html', function () { if (typeof Coveo !== 'undefined') { loadCoveoComponents(); } });
+    $('#clouddocs-footer').load(host + '/footer.html');
+  }
 });
 
 function isJwtExpired(token) {
