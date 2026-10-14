@@ -1,0 +1,10 @@
+/* Site-specific overrides on top of the f5-neteng theme (which carries the clouddocs /
+ * F5 training-class look). Keep minimal: this skin is production-F5. */
+.nav-sidebartoc h5 {
+  font-size: 14px;
+  color: #04395d;
+}
+pre.mermaid {
+  max-width: 100%;
+  overflow-x: auto;
+}

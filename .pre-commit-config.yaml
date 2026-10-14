@@ -12,12 +12,12 @@ repos:
     hooks:
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
-        exclude: '(^keys/|.*\.(pem|crt|key)$|^(AGENTS|PLAN)\.md$)'
+        exclude: '(^keys/|^docs/_themes/|.*\.(pem|crt|key)$|^(AGENTS|PLAN)\.md$)'
       - id: end-of-file-fixer
-        exclude: '(^keys/|.*\.(pem|crt|key)$|^(AGENTS|PLAN)\.md$)'
+        exclude: '(^keys/|^docs/_themes/|.*\.(pem|crt|key)$|^(AGENTS|PLAN)\.md$)'
       - id: mixed-line-ending
         args: [--fix=lf]
-        exclude: '^keys/'
+        exclude: '(^keys/|^docs/_themes/)'
       - id: check-case-conflict
       - id: check-merge-conflict
       - id: check-symlinks
@@ -29,7 +29,7 @@ repos:
       - id: check-toml
       - id: check-added-large-files
       - id: detect-private-key
-        exclude: '^keys/'  # credential material is reviewed by hand, never committed (AGENTS.md rule 1)
+        exclude: '(^keys/|^docs/_themes/)'  # keys/: credential material (AGENTS.md rule 1); _themes/: vendored files stay byte-identical
 
   # No standalone shell scripts live in this repo (AGENTS.md rule 2: the only
   # scripted surface is Nix); shellcheck covers anything that slips in anyway.
@@ -45,6 +45,6 @@ repos:
       - id: gitleaks
         name: Detect hardcoded secrets
         description: Detect hardcoded secrets using Gitleaks
-        entry: gitleaks protect --verbose --redact --staged
+        entry: gitleaks protect --verbose --redact --staged --config gitleaks.toml
         language: golang
         pass_filenames: false

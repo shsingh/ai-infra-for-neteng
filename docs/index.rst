@@ -22,6 +22,12 @@ The build plan and agent contract live in the repository root:
 
 .. toctree::
    :maxdepth: 2
+   :caption: Environment:
+
+   lab-environment
+
+.. toctree::
+   :maxdepth: 2
    :caption: Lab Guides:
 
    labs/lab01-kubernetes

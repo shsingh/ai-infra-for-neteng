@@ -30,12 +30,14 @@ release = ""
 extensions = [
     "sphinx.ext.extlinks",
     "sphinx_copybutton",
+    "sphinxcontrib.mermaid",
     "myst_parser",
 ]
 
 source_suffix = [".rst", ".md"]
 
 myst_enable_extensions = ["colon_fence", "deflist", "tasklist"]
+myst_fence_as_directive = ["mermaid"]  # render ```mermaid fences (GitHub-compatible) as diagrams
 myst_heading_anchors = 3
 
 templates_path = ["_templates"]
