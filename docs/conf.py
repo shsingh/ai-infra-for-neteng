@@ -3,6 +3,13 @@
 # Mirrors the F5 AppWorld labs template (f5_sphinx_theme) so the rendered site
 # matches the production lab-guide look used across F5 training content.
 # Markdown sources (docs/labs/*.md) parse via MyST.
+#
+# Asset policy (offline contract, PLAN §4.1 / §8.2.1): every browser asset is
+# served from _static — no CDN, no analytics, no third-party favicon. Vendored
+# copies live under _static/vendor/ and _static/fonts/.
+#
+# NOTE: font-awesome + jQuery + mark.js load via _themes/f5-neteng-theme/head.html;
+# the CDN URLs there point at the vendored copies. Keep both sides in sync.
 
 import os
 import sys
@@ -55,6 +62,17 @@ rst_prolog = """
 extlinks = {
     "issues": ("%s/issues/%%s" % github_repo, "issue "),
 }
+
+# -- Vendored browser assets (offline contract) -------------------------------
+# sphinxcontrib-mermaid accepts local absolute paths for its asset overrides;
+# the vendored mermaid.esm.min.mjs imports its chunks relative to its own file,
+# so no shim is needed. ELK is not used by any diagram and is not vendored.
+
+mermaid_version = "11.12.1"      # kept for the asset ?v= hash; file resolved locally below
+mermaid_use_local = "vendor/mermaid.esm.min.mjs"   # add_js_file prepends _static/; Sphinx links it depth-correct
+mermaid_include_elk = ""         # ELK layout pack not used by any diagram ("" => no ELK script)
+mermaid_d3_version = "7.9.0"
+d3_use_local = "vendor/d3.min.js"
 
 # -- Options for HTML output -------------------------------------------------
 

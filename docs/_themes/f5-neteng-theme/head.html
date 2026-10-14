@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 
 <head>
-  {%- block analytics %}
-  {# GoogleAnalytics #}
-  <!-- Google Tag Manager -->
-  <script>(function (w, d, s, l, i) { w[l] = w[l] || []; w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' }); var f = d.getElementsByTagName(s)[0], j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f); })(window, document, 'script', 'dataLayer', 'GTM-PPZPQ6');</script>
-  <!-- End Google Tag Manager -->
-  {%- endblock %}
+  <script type="importmap">
+  {# mermaid's run template imports "vendor/mermaid.esm.min.mjs" (bare specifier).
+     Map it to the page-relative _static copy so the import resolves at any depth. #}
+  {%- set depth_prefix = "./" * (pagename.count("/") == 0) + ("../" * (pagename.count("/"))) -%}
+  {"imports": {"vendor/": "{{ depth_prefix }}_static/vendor/"}}
+  </script>
+  {%- block analytics %}{%- endblock %}
 
   {%- block htmltitle %}
   <title>{{ title|striptags|e }}{{ titlesuffix }}</title>
@@ -44,13 +45,11 @@
   <link rel="stylesheet" href="{{ prefix }}_static/css/f5.css">
   <link rel="stylesheet" href="{{ prefix }}_static/css/f5-theme.css">
   <link rel="stylesheet" href="{{ prefix }}_static/css/custom.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="{{ prefix }}_static/vendor/font-awesome.min.css">
 
-  {# FAVICON #}
-  <link href="https://cdn.f5.com/favicon.ico" rel="icon">
-
-  {# jQuery + mark.js: required by the theme's sidebar/clouddocs JS (Sphinx >=6 no longer ships jQuery) #}
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  {# jQuery + mark.js: required by the theme's sidebar/clouddocs JS (Sphinx >=6 no longer ships jQuery) —
+     vendored copies (offline contract); upstream CDN pinned files in _static/vendor/ #}
+  <script src="{{ prefix }}_static/vendor/jquery.min.js"></script>
+  <script src="{{ prefix }}_static/vendor/jquery.mark.min.js"></script>
 
 </head>

@@ -5,16 +5,11 @@
 
 
 
-{% set script_files = script_files + [
-"https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.js"
-]%}
+{# mark.js + jQuery load in head.html from _static/vendor (single load; offline contract) #}
 
 {% include "head.html" %}
 
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PPZPQ6" height="0" width="0"
-    style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
+<!-- Google Tag Manager (noscript) omitted: analytics disabled in this build (offline/no-tracking policy) -->
 
 {# Do not create the standard relbars and sidebars #}
 {%- block relbar1 %}{% endblock %}
