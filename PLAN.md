@@ -497,7 +497,7 @@ nix run .#m8-pool                # apply InferencePool; rewire HTTPRoute backend
 nix run .#m8-blast-again         # per-pod tally + TTFT comparison
 nix run .#m8-tmctl               # print the four tmctl tables (§6.1 verification)
 nix run .#m9-telemetry           # curated kubectl/jsonpath 'show' set + EPP Prom metrics
-nix run .#m9-drill -- <fault-id
+nix run .#m9-drill -- <fault-id>
 nix run .#m12-attack             # seed jailbreak corpus through the Gateway
 nix run .#m13-hsl-tail           # follow the token-usage HSL stream
 nix run .#m13-breach             # drive a teaching-tier key past its budget (429 demo)
