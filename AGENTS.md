@@ -7,13 +7,13 @@ discrepancy must be raised as a repo issue.
 
 ## What this repository is
 
-`ai-infra-for-network-engineers` is the public lab repository for the instructor-led course
+`ai-infra-for-neteng` is the public lab repository for the instructor-led course
 **AI Infrastructure for Network Engineers** (BIG-IP Next for Kubernetes 2.4 edition). When
 the build is complete, cloning this repo onto a plain Linux amd64 VM and running:
 
 ```text
-git clone https://github.com/shsingh/ai-infra-for-network-engineers.git
-cd ai-infra-for-network-engineers
+git clone https://github.com/shsingh/ai-infra-for-neteng.git
+cd ai-infra-for-neteng
 nix run .#bootstrap
 nix develop
 nix run .#doctor
@@ -21,7 +21,9 @@ nix run .#doctor
 
 stands up the complete lab environment — no other tooling installed by hand except Docker
 and Nix itself. The repository also renders the student lab guides (AppWorld-style,
-task-based) to GitHub Pages.
+task-based) to GitHub Pages, and an offline bundle mode (`airgap-bundle`) makes the VM
+fully self-sustained: environment, guides, and locally rendered docs run with no internet
+connection.
 
 The course teaches: Kubernetes for network engineers, BNK (BIG-IP Next for Kubernetes) 2.4
 installation in demo mode, BGP/VRF/EVPN routing via CRDs, Gateway API ingress, traditional
@@ -38,9 +40,9 @@ Build, in order, and verify against a running environment:
    course order (`manifests/`), an FRR fabric-peer container (`fabric/`), fault injection
    (`nix run .#break-fix`), and a bootstrap app that takes a bare VM to a green doctor board.
 2. **The lab guides** — one guide per module under `docs/labs/`, in the task-based format
-   defined in PLAN.md §7, rendered by mkdocs-material to GitHub Pages via GitHub Actions.
+   defined in [PLAN — Lab guides](PLAN.md#7-lab-guides-appworld-format), rendered by mkdocs-material to GitHub Pages via GitHub Actions and locally on the lab VM (`nix run .#docs`, offline-capable).
 3. **The operating contract** — bootstrap / sync / reset / teardown commands as specified in
-   PLAN.md §8, plus `README.md` (student quickstart) and `FACILITATOR.md` (T-minus checklist,
+   [PLAN — Environment contract](PLAN.md#8-environment-contract-init-sync-reset), plus `README.md` (student quickstart) and `FACILITATOR.md` (T-minus checklist,
    version ledger, credentials how-to).
 
 ## Non-negotiable rules
@@ -58,7 +60,7 @@ Build, in order, and verify against a running environment:
    branches; open PRs for review; the repository owner merges. CI (`nix flake check`,
    manifest validation, docs build) must be green before a PR is opened.
 5. **Stop conditions.** If the pinned deployer cannot be made to deliver BNK 2.4.0 (see the
-   release-manifest override in PLAN.md §5), stop and surface the failure — never build the
+   release-manifest override in [PLAN — Version pins](PLAN.md#5-version-pins)), stop and surface the failure — never build the
    course on an older BNK release and never silently substitute feature behavior. Likewise
    stop if a manifest's documented fields do not validate against the actually-deployed CRDs.
 6. **x86_64 only.** The F5 container images are published for linux/amd64. Every host, VM,
@@ -77,7 +79,7 @@ Build, in order, and verify against a running environment:
 ## Target repository tree
 
 ```text
-ai-infra-for-network-engineers/
+ai-infra-for-neteng/
 ├── AGENTS.md                 # this file
 ├── PLAN.md                   # the full work plan (source of truth for the build)
 ├── README.md                 # student quickstart
@@ -95,8 +97,8 @@ ai-infra-for-network-engineers/
 └── reports/                  # gitignored: build + scenario reports
 ```
 
-The complete tree, per-file purpose, and per-manifest key fields are specified in PLAN.md §4
-and §6.
+The complete tree, per-file purpose, and per-manifest key fields are specified in [PLAN — Repository layout](PLAN.md#4-repository-layout)
+and [PLAN — Manifest specifications](PLAN.md#6-manifest-specifications).
 
 ## Command contract
 
@@ -106,15 +108,15 @@ and §6.
 | `nix run .#doctor` | environment green board; the arbiter of "ready to teach" |
 | `nix develop` | pinned student shell (KUBECONFIG, kind/kubectl/helm/jq/yq) |
 | `nix run .#sync` | repo-to-cluster sync: dry-run, apply changed manifests, drift report |
-| `nix run .#break-fix -- <id> apply\|restore` | inject/restore a taught fault (8 faults, PLAN.md §6.4) |
+| `nix run .#break-fix -- <id> apply\|restore` | inject/restore a taught fault (8 faults, [PLAN — Fault injection](PLAN.md#64-fault-injection-8-faults-apply--taught-diagnosis--exact-inverse-restore)) |
 | `nix run .#reset -- <module>` | return a module to pristine state |
 | `nix run .#teardown` | symmetric destroy |
 
-Per-module apps (`m1-orient` … `m13-breach`) are specified in PLAN.md §4.4.
+Per-module apps (`m1-orient` … `m13-breach`) are specified in [PLAN — Per-module apps](PLAN.md#83-per-module-apps-course-order).
 
 ## Current status
 
-Update this section as stages complete, referencing PLAN.md §7 (Stage 0 … Stage 10).
+Update this section as stages complete, referencing [PLAN — Build order](PLAN.md#9-build-order-stages-and-exit-gates) (Stage 0 … Stage 10).
 
 | Stage | Scope | Status |
 |---|---|---|
@@ -132,7 +134,7 @@ Update this section as stages complete, referencing PLAN.md §7 (Stage 0 … Sta
 
 ## Definition of done
 
-All acceptance gates in PLAN.md §10 pass (flake check, install, routing, ingress, classic LB,
+All acceptance gates in [PLAN — Acceptance gates](PLAN.md#10-acceptance-gates) pass (flake check, install, routing, ingress, classic LB,
 AI path with tmctl evidence, faults, guides derived from captures, two consecutive
 clean-clone bootstraps, symmetric teardown, airgap path), and the final PR is merged by the
 repository owner.
