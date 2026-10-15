@@ -129,7 +129,7 @@ Update this section as stages complete, referencing [PLAN — Build order](PLAN.
 | Stage | Scope | Status |
 |---|---|---|
 | 0 | Repo created; AGENTS.md + PLAN.md + .gitignore committed | **done** (pre-commit + governance live; merged) |
-| 1 | Flake skeleton + doctor | not started |
+| 1 | Flake skeleton + doctor | **done** (flake check green, doctor honest, kindbnkctl pinned) |
 | 2 | BNK 2.4.0 install path (risk stage; do first among build stages) | not started |
 | 3 | GAIE CRDs + verification plumbing | not started |
 | 4 | M4 fabric + routing manifests | not started |

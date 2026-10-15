@@ -4,7 +4,6 @@ name: docs
 #   cd docs && make html        (or)   nix run .#docs   (offline-capable, pinned toolchain)
 on:
   pull_request:
-    paths: ["docs/**", "course/**", "PLAN.md", ".github/workflows/docs.yml"]
   push:
     branches: [master]
 
