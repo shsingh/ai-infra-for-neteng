@@ -35,6 +35,30 @@ drills, and the version ledger.
    (`docs/labs/lab02-install-bnk.md` onward) before the course; fix anything that needs
    fixing and record it in the version ledger below.
 
+## Supplying credentials during the build (agent handoff)
+
+During the build stages, the lab host is resolved first: a locally provisioned VM
+(`vm-local`) or a lab/cloud instance over SSH (`ssh`). The build agent asks which when the
+answer is not already recorded in `targets/target.env`
+([AGENTS.md — Execution target](AGENTS.md#execution-target-vm-local-or-ssh), including that
+gitignored file's schema).
+
+Credentials reach the build two ways:
+
+1. **Direct placement (preferred).** Place the FAR tarball and the operator JWT into `keys/`
+   of the checkout **on the lab host**, then tell the agent they are placed. The agent
+   checks existence only — it never opens the files.
+2. **Agent hand-over (opt-in).** Hand the agent the files' local paths in the session; it
+   copies them byte-for-byte, unopened, into `keys/` on the lab host. Nothing is printed,
+   logged, or committed.
+
+Where the deployer accepts a license or release override as an environment variable (see the
+2.4.0 override note below), the agent applies it only inside the deploy step on the lab host,
+records the mechanism (never the value) in the version ledger, and never echoes it. Any new
+entitlement the plan introduces (for example an Early Access feature) follows the same
+ask-and-confirm gate before anything is consumed for it
+([AGENTS.md — Credential and license handoff](AGENTS.md#credential-and-license-handoff-ask-then-confirm)).
+
 ## Running the day
 
 - Before students arrive: `nix run .#doctor` green; projector + printed handout from
