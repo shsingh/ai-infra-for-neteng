@@ -26,7 +26,12 @@ disagree, the F5 docs win and this plan must be corrected.
 Rules for any agent executing this plan:
 
 - Credentials (FAR image-pull secret tarball, license JWT) are supplied by the facilitator
-  into `keys/` (gitignored). Agents never create, request, or read them.
+  or repository owner into `keys/` (gitignored) on the lab host. Agents never read their
+  contents; the supply path is the ask-and-confirm handoff
+  ([AGENTS.md — Credential and license handoff](AGENTS.md#credential-and-license-handoff-ask-then-confirm)).
+- The build agent resolves where the lab VM lives before Stage 2 — a locally provisioned VM
+  (vm-local) or a lab/cloud instance over SSH — per
+  [AGENTS.md — Execution target](AGENTS.md#execution-target-vm-local-or-ssh).
 - Every expected output in a guide must come from a captured run in `docs/expected/`.
 - Work happens on feature branches; PRs are reviewed and merged by the repository owner.
 - Stop conditions: see [AGENTS.md — Non-negotiable rules](AGENTS.md#non-negotiable-rules) rules 5–6. Never build on BNK < 2.4.0; never attempt arm64.
@@ -45,7 +50,11 @@ Rules for any agent executing this plan:
 
 One VM carries everything (the `bgp-peer-frr` pattern: the BGP session rides a Multus
 bridge net1 on 192.168.99.0/24 inside the worker). A second VM is only for the optional
-external-fabric variant — deferred, never gating.
+external-fabric variant — deferred, never gating. Where that VM lives is resolved at build
+time, not assumed: a locally provisioned VM (vm-local) or a lab/cloud instance reached over
+SSH (ssh) — identical tooling either way; the resolution contract and env schema are in
+[AGENTS.md — Execution target](AGENTS.md#execution-target-vm-local-or-ssh). Classroom delivery
+instances follow [the attendee-instance model](#81-the-attendee-instance-model).
 
 Sizing rationale: the BNK chart set reserves roughly 20 Gi of memory on the TMM worker and
 about 12 cores; the real steady-state working set is ≈ 6 GB. kind does not partition the
@@ -564,7 +573,7 @@ does not proceed past a red gate.
 |---|---|---|
 | 0 | Repo init; AGENTS/PLAN/.gitignore/README/FACILITATOR skeleton | files present; keys/ ignored |
 | 1 | Flake skeleton + doctor; kindbnkctl pinned | `nix flake check` green; doctor honest |
-| 2 | **BNK 2.4.0 install path** (risk stage): init demo; keys placed; 2.4.0 override; e2e; CRD inventory capture | CNEInstance Available=True; doctor green; CRD inventory recorded; **stop if 2.4.0 unachievable** |
+| 2 | **BNK 2.4.0 install path** (risk stage): execution target resolved ([AGENTS.md — Execution target](AGENTS.md#execution-target-vm-local-or-ssh)); keys placed via the [credential handoff](AGENTS.md#credential-and-license-handoff-ask-then-confirm); init demo; 2.4.0 override; e2e; CRD inventory capture | CNEInstance Available=True; doctor green; CRD inventory recorded; **stop if 2.4.0 unachievable** |
 | 3 | GAIE v1.4.0 CRDs hashed; doctor extended | doctor green incl. inference CRDs |
 | 4 | M4: frr.conf + spine image; bgp manifests; apply in documented order; capture | BGP Established both sides; routes exchanged; immutability drill reproduces |
 | 5 | M5–M7 manifests + apps; capture | every apply verified end to end |
@@ -607,9 +616,11 @@ required.
 | Amber shapes on the 2-node demo shape (e.g. per-Gateway IPAM auto-creation) | Gateway never Programmed | Course uses static spec.addresses VIPs; GRPCRoute is not used; doctor preflights IPAM responsiveness |
 | TMM restart churn during scenario runs | Some scenarios take minutes; TMM restarts mid-run | Apps wait on status, not wall-clock; capped wait tolerances |
 | F5 images amd64-only | Platform-mismatch pods Pending | x86_64 VM mandatory; preflight asserts amd64 |
+| Build driven against the wrong machine | Preflight green on the controller, red or absent on the actual VM; artifacts stranded away from the checkout | Execution-target gate before Stage 2 ([AGENTS.md — Execution target](AGENTS.md#execution-target-vm-local-or-ssh)); doctor/preflight always run on the lab host; captures copied back to the controller checkout after each gate |
 | Repo hygiene | Git repo inside a cloud-synced path corrupts history | Working clones live under the home directory, never in sync-client-managed trees |
 | Standalone scripts reintroduced during debugging | A lab.sh appears outside the Nix surface | No standalone .sh files; Nix apps only; reviewed in PRs |
 | Secrets exposure | Credential material committed | keys/ gitignored from first commit; CI check that no staged file comes from keys/ |
+| Credential handoff blocks a stage silently | Stage 2 parked with no owner response; agent improvises around a missing JWT or secret | One structured ask on the entry issue ([AGENTS.md — Credential and license handoff](AGENTS.md#credential-and-license-handoff-ask-then-confirm)); confirmed-only consumption; the gate is a stop condition |
 
 ## 12. Operating the course afterwards
 
