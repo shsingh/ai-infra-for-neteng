@@ -1,6 +1,9 @@
 # Credential material — never commit (see AGENTS.md rule 1, PLAN.md §8.1)
 keys/
 
+# Execution-target config (hostnames/IPs) — see AGENTS.md, Execution target section
+targets/
+
 # Build and run artifacts
 reports/
 artifacts/

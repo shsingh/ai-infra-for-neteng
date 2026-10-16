@@ -55,9 +55,14 @@ Build, in order, and verify against a running environment:
 ## Non-negotiable rules
 
 1. **Never commit secrets.** The two credential files (an image-pull secret tarball and a
-   license JWT) belong in `keys/`, which is gitignored from the first commit. Never read,
-   print, move, or copy their contents. If they are missing, tooling must fail with a human
-   message pointing at `FACILITATOR.md`. Agents never request or handle credentials.
+   license JWT) belong in `keys/`, which is gitignored from the first commit. Agents never
+   read, print, or log their contents; their contents are consumed only by the pinned
+   deployer and the image pre-pull. Supplying them follows the ask-and-confirm handoff
+   ([Credential and license handoff](#credential-and-license-handoff-ask-then-confirm)): an
+   agent may request that the repository owner supply them and, once the owner explicitly
+   hands them over, copy the files byte-for-byte, unopened, into `keys/` on the lab host.
+   If they are still missing, tooling must fail with a human message pointing at
+   `FACILITATOR.md`.
 2. **No standalone shell scripts in the repo.** The only scripted surface is Nix (`flake.nix`,
    `apps/*.nix`, `pkgs/*.nix`). Anything a shell script would do becomes a Nix app.
 3. **Expected outputs are captured, never invented.** Every expected output quoted in a lab
@@ -82,6 +87,109 @@ Build, in order, and verify against a running environment:
 10. **Accurate scoping.** Features that are Early Access (semantic caching) or outside the
     demo-mode shape (DPU, SR-IOV, GRPCRoute) appear as demo/slides material only; guides say
     so explicitly.
+11. **Resolve the execution target before any build action.** Every Nix app, preflight, and
+    capture executes on the lab host — either a locally provisioned VM (vm-local) or a
+    lab/cloud instance reached over SSH (ssh) — per
+    [Execution target](#execution-target-vm-local-or-ssh). The agent never assumes the machine
+    it is running on is the lab host, and never lets a preflight score the controller where it
+    should score the VM: rule 6 asserts amd64 on the lab host; the controller is only a driver.
+12. **Never consume license or credential material without a confirmed handoff.** Any
+    entitlement a build step needs — the operator license JWT, the FAR image-pull secret, or
+    any additional license the plan or a module introduces — passes the
+    [ask-and-confirm handoff](#credential-and-license-handoff-ask-then-confirm) first: ask,
+    wait for explicit owner confirmation, then proceed. A missing or unconfirmed entitlement
+    is a stop condition, handled exactly like a red doctor board (rule 5).
+
+## Execution target (vm-local or ssh)
+
+The lab host is one Linux amd64 VM per [PLAN — Lab architecture](PLAN.md#2-lab-architecture).
+Before Stage 2 — and before any command whose preflight asserts the environment floor — the
+build agent resolves where that VM lives and how commands reach it. Two supported modes, and
+the tooling is identical in both: the Nix apps, `doctor`, and every captured output always
+execute on the lab host; the machine the agent runs on is only a controller.
+
+Resolution order — first match wins:
+
+1. `AIFNE_TARGET_MODE` set in the agent session (`vm-local` or `ssh`).
+2. `targets/target.env` at the top of the controller checkout (gitignored; schema below).
+3. Neither present → the agent stops and asks the repository owner before provisioning or
+   running anything, records the answer in `targets/target.env`, and states it on the entry
+   issue so later stages and session restarts resolve deterministically.
+
+When the answer is not already recorded, the agent presents both options with what they mean
+for the next stage:
+
+- **vm-local — the VM runs on the controller host (development/testing).** The agent reuses
+  an existing local VM or provisions one, sized to the [floor](PLAN.md#2-lab-architecture)
+  (16c/32 GB recommended, 12c/28 GB absolute), with Docker Engine and Nix present inside it
+  ([the host-prep model](PLAN.md#81-the-attendee-instance-model)). Commands run through
+  `AIFNE_TARGET_SHELL` — whatever opens a non-interactive shell inside that VM (the VM
+  runner's shell command, or SSH on its forwarded port). A VM that emulates amd64 on a
+  non-amd64 controller passes the in-VM architecture check but is not a supported Stage 2+
+  build path — TMM and kind performance under emulation does not represent the lab; if the
+  controller cannot host a floor-sized amd64 VM natively, use the ssh mode instead.
+- **ssh — the build happens on an existing lab/cloud instance.** The agent works through SSH
+  (BatchMode, a dedicated key), runs long operations detached (`nohup` or a terminal
+  multiplexer) so a dropped connection never kills a bootstrap, and brings captured outputs
+  (`docs/expected/`, `reports/`) back to the controller checkout with `scp`/`rsync` after
+  each stage gate. Hostnames and IPs live in `targets/target.env` — never in issues, PRs,
+  captures, or committed files.
+
+`targets/target.env` schema (never committed — it resolves the target; it carries no secrets):
+
+```text
+AIFNE_TARGET_MODE=vm-local|ssh                  # which machine hosts the lab VM
+AIFNE_TARGET_SHELL=<vm-local: command that opens a non-interactive shell inside the VM, or raw exec when the agent already runs on the VM>
+AIFNE_TARGET_SSH_HOST=<ssh: hostname or IP>     # required under ssh
+AIFNE_TARGET_SSH_USER=<ssh: user>               # optional
+AIFNE_TARGET_SSH_PORT=<ssh: port>               # optional
+AIFNE_TARGET_SSH_KEY=<ssh: identity file path>  # optional; otherwise ssh agent defaults
+AIFNE_LAB_DIR=<path of the repository checkout on the lab host>
+```
+
+Mode rules:
+
+- The floor is always asserted **on the lab host** (doctor/preflight already do this); a
+  controller that meets the floor never excuses a VM below it.
+- Under ssh, every path in the guides, apps, and this contract is a lab-host path; the Nix
+  apps run inside `AIFNE_LAB_DIR` on that host, and `keys/` belongs to that host's checkout.
+- Under vm-local, the controller checkout and the lab checkout are distinct trees: unless the
+  shell transport literally executes inside the VM, nothing build-related runs on the
+  controller (only repo sync and capture archival do).
+- Every mode keeps the four-part app contract (announce → run → verify → expected output) and
+  rule 8 progress discipline; long operations stream through the transport unbuffered.
+
+## Credential and license handoff (ask-then-confirm)
+
+Credential material is never invented, guessed, or treated as available before the
+repository owner confirms it. When a build stage reaches a step that consumes the two
+credential files (FAR image-pull secret tarball, operator license JWT — the preflight in
+`apps/bootstrap.nix` checks their presence by name and count, never content), or when a new
+license/entitlement requirement appears anywhere in the build:
+
+1. **Check** — on the resolved execution target, check `keys/` for the expected files:
+   existence and rough size only; contents stay sealed (rule 1).
+2. **Ask** — if missing, or a new entitlement shows up in the plan, post one structured ask
+   on the entry issue: which files, the exact `keys/` path on the lab host, and the two
+   supply channels —
+   - the repository owner places the files into `keys/` on the lab host themselves; or
+   - the owner hands the agent the files' local paths in-session, and the agent copies them
+     byte-for-byte, unopened, into `keys/` on the lab host — never printed, logged,
+     committed, or included in a capture.
+3. **Confirm** — proceed only after the owner confirms placement; re-check, then continue
+   the stage. No confirmation → the stage parks and the agent waits. This gate is a stop
+   condition, not a prompt to improvise (rule 12).
+4. **Env-var channel (owner opt-in only)** — where the deployer's documented mechanism
+   accepts a license or release override as an environment variable
+   ([PLAN — kindbnkctl integration](PLAN.md#42-kindbnkctl-integration); the 2.4.0 override
+   note in `FACILITATOR.md`), the owner may prefer to supply the value that way. The agent
+   applies it only within the deploy step's session on the lab host, never echoes it, never
+   writes it into any repo file, guide, capture, issue, or PR, and records only the
+   mechanism (never the value) in the version ledger. Files-in-`keys/` remains the default;
+   the env channel exists for material the owner is comfortable transiting the session.
+5. **New entitlements** (an Early Access feature, or a future module needing another license)
+   go through the same gate before anything is downloaded, mounted, or configured for them —
+   the agent surfaces the requirement and waits; it never works around a missing license.
 
 ## Target repository tree
 
