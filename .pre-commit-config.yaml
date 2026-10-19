@@ -34,13 +34,13 @@ repos:
   # No standalone shell scripts live in this repo (AGENTS.md rule 2: the only
   # scripted surface is Nix); shellcheck covers anything that slips in anyway.
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.11.0.1
+    rev: v0.11.0.1-1
     hooks:
       - id: shellcheck
 
   # Secret scanning — keys/ holds credential material (gitignored, but belt and braces)
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.30.1
+    rev: v8.30.0
     hooks:
       - id: gitleaks
         name: Detect hardcoded secrets
